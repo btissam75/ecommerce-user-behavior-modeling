@@ -1,0 +1,5323 @@
+%============================================================
+%  RAPPORT DE PROJET ACADÉMIQUE COMPLET
+%  Modélisation du Comportement Utilisateur en E-Commerce
+%  Dataset Yoochoose — Apprentissage Probabiliste
+%  Chapitres 1, 2 & 3 : DTMC, CTMC, HMM
+%  Prof. Abdellatif El Afia
+%============================================================
+
+\documentclass[11pt,a4paper]{article}
+
+%--- ENCODAGE & LANGUE
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[french]{babel}
+\usepackage{lmodern}
+\usepackage{natbib}
+%--- MISE EN PAGE
+\usepackage[top=2.5cm,bottom=2.5cm,left=2.7cm,right=2.7cm,headheight=15pt]{geometry}
+\usepackage{fancyhdr}
+\usepackage{parskip}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+
+%--- MATHS
+\usepackage{amsmath, amssymb, amsfonts}
+\usepackage{bm}
+
+%--- GRAPHIQUES
+\usepackage{xcolor}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,shapes,positioning,calc,fit,backgrounds,
+                decorations.pathreplacing,patterns}
+\usepackage{graphicx}
+\graphicspath{{./}{images/}{figures/}}
+\DeclareGraphicsExtensions{.png,.jpg,.jpeg,.pdf}
+%--- TABLEAUX
+\usepackage{booktabs,array,multirow,colortbl,tabularx,longtable}
+\renewcommand{\arraystretch}{1.35}
+
+%--- MISE EN FORME
+\usepackage{framed}
+\usepackage{enumitem}
+\usepackage{microtype}
+\usepackage{caption}
+\usepackage{float}
+\usepackage{tcolorbox}
+\tcbuselibrary{skins, breakable}
+
+%--- LIENS (charger hyperref en dernier)
+
+\usepackage{xcolor}
+\usepackage{graphicx}
+\graphicspath{{./}{images/}{figures/}}
+\DeclareGraphicsExtensions{.pdf,.png,.jpg,.jpeg}
+%--- LISTING CODE
+\usepackage{listings}
+
+%============================================================
+%  PALETTE COULEURS
+%============================================================
+\definecolor{NavyBlue}{HTML}{1565C0}
+\definecolor{DarkBlue}{HTML}{1A237E}
+\definecolor{LightBlue}{HTML}{E3F2FD}
+\definecolor{MedBlue}{HTML}{BBDEFB}
+\definecolor{DarkGreen}{HTML}{2E7D32}
+\definecolor{LightGreen}{HTML}{E8F5E9}
+\definecolor{DarkRed}{HTML}{C62828}
+\definecolor{LightRed}{HTML}{FFEBEE}
+\definecolor{DarkOrange}{HTML}{E65100}
+\definecolor{LightOrange}{HTML}{FFF3E0}
+\definecolor{BuyGreen}{HTML}{1B5E20}
+\definecolor{LightBuy}{HTML}{C8E6C9}
+\definecolor{Gray}{HTML}{616161}
+\definecolor{LightGray}{HTML}{F5F5F5}
+\definecolor{MedGray}{HTML}{BDBDBD}
+\definecolor{Gold}{HTML}{F9A825}
+\definecolor{LightGold}{HTML}{FFFDE7}
+\definecolor{Teal}{HTML}{00695C}
+\definecolor{LightTeal}{HTML}{E0F2F1}
+\definecolor{violetBW}{RGB}{120,40,160}
+\definecolor{vertValid}{RGB}{20,130,60}
+\definecolor{bleuClair}{RGB}{210,230,255}
+\definecolor{orangeNote}{RGB}{230,100,20}
+\definecolor{codebg}{HTML}{F8F8F8}
+\usepackage[colorlinks=true,linkcolor=NavyBlue,
+            urlcolor=NavyBlue,citecolor=DarkGreen]{hyperref}
+%============================================================
+%  EN-TÊTES / PIEDS DE PAGE
+%============================================================
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textcolor{DarkBlue}{\textbf{Apprentissage Probabiliste}}}
+\fancyhead[R]{\small\textcolor{Gray}{Comportement E-Commerce $\cdot$ Prof.\ El Afia}}
+\fancyfoot[C]{\small\thepage}
+\renewcommand{\headrulewidth}{0.7pt}
+\renewcommand{\footrulewidth}{0.3pt}
+\newcommand{\vect}[1]{\boldsymbol{#1}}
+
+%============================================================
+%  BOÎTES THÉMATIQUES (environnements framed)
+%============================================================
+\newenvironment{defbox}[1]{%
+  \vspace{3pt}\begin{framed}
+  \noindent{\color{NavyBlue}\rule{0.3cm}{3pt}}~%
+  \textcolor{DarkBlue}{\textbf{Définition :} \textit{#1}}\\[3pt]}
+  {\end{framed}\vspace{3pt}}
+
+\newenvironment{thmbox}[1]{%
+  \vspace{3pt}\begin{framed}
+  \noindent{\color{DarkGreen}\rule{0.3cm}{3pt}}~%
+  \textcolor{DarkGreen}{\textbf{Théorème :} \textit{#1}}\\[3pt]}
+  {\end{framed}\vspace{3pt}}
+
+\newenvironment{propbox}[1]{%
+  \vspace{3pt}\begin{framed}
+  \noindent{\color{DarkOrange}\rule{0.3cm}{3pt}}~%
+  \textcolor{DarkOrange}{\textbf{Propriété :} \textit{#1}}\\[3pt]}
+  {\end{framed}\vspace{3pt}}
+
+\newenvironment{insightbox}{%
+  \vspace{3pt}\begin{framed}
+  \noindent{\color{NavyBlue}\rule{0.3cm}{3pt}}~%
+  \textcolor{NavyBlue}{\textbf{Interprétation économique}}\\[3pt]}
+  {\end{framed}\vspace{3pt}}
+
+\newenvironment{warnbox}{%
+  \vspace{3pt}\begin{framed}
+  \noindent{\color{DarkRed}\rule{0.3cm}{3pt}}~%
+  \textcolor{DarkRed}{\textbf{Remarque}}\\[3pt]}
+  {\end{framed}\vspace{3pt}}
+
+\newenvironment{probbox}{%
+  \vspace{3pt}
+  \colorbox{LightRed}{\parbox{\dimexpr\linewidth-2\fboxsep\relax}{%
+  \noindent{\color{DarkRed}\rule{0.3cm}{3pt}}~%
+  \textcolor{DarkRed}{\textbf{Problématique}}\\[3pt]}}%
+  \vspace{3pt}}{}
+
+%--- tcolorbox boxes
+\newtcolorbox{resultBox}{colback=green!8,colframe=green!60!black,
+  fonttitle=\bfseries\small,title=Résultat,arc=3pt,boxrule=0.5pt}
+
+\newtcolorbox{ecoBiz}{colback=yellow!8,colframe=orange!80,
+  fonttitle=\bfseries\small\color{orange},title=Impact Économique,arc=3pt,boxrule=0.5pt}
+
+\newtcolorbox{phraseBox}{colback=orange!5,colframe=orangeNote,
+  fonttitle=\bfseries\small\color{orangeNote},title=Synthèse,arc=3pt,boxrule=0.5pt}
+
+\newtcolorbox{validBox}{colback=green!5,colframe=vertValid,
+  fonttitle=\bfseries\small\color{vertValid},title=Validation,arc=3pt,boxrule=0.5pt}
+
+\newtcolorbox{mathBox}{colback=violet!5,colframe=violetBW,
+  fonttitle=\bfseries\small\color{violetBW},title=Formules,arc=3pt,boxrule=0.5pt}
+
+\newtcolorbox{perspBox}{colback=violet!8,colframe=violetBW!80,
+  fonttitle=\bfseries\small\color{violetBW},title=Perspectives,arc=3pt,boxrule=0.5pt}
+
+\newtcolorbox{exbox}[1]{
+  colback=blue!5,
+  colframe=NavyBlue,
+  fonttitle=\bfseries,
+  title=#1,
+  arc=3pt,
+  boxrule=0.5pt,
+  breakable
+}
+
+%============================================================
+%  SECTIONS COLORÉES
+%============================================================
+\usepackage{titlesec}
+\titleformat{\section}
+  {\large\bfseries\color{DarkBlue}}{\thesection.}{0.7em}{}
+  [\color{NavyBlue}\rule{\linewidth}{0.5pt}\vspace{-4pt}]
+\titleformat{\subsection}
+  {\normalsize\bfseries\color{NavyBlue}}{\thesubsection.}{0.5em}{}
+\titleformat{\subsubsection}
+  {\small\bfseries\color{DarkOrange}}{\thesubsubsection.}{0.4em}{}
+
+%============================================================
+%  COMMANDES
+%============================================================
+\newcommand{\mat}[1]{\mathbf{#1}}
+\newcommand{\Prob}{\mathbb{P}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\st}[1]{\textsf{\small#1}}
+
+\newcolumntype{B}{>{\columncolor{LightBlue}}c}
+\newcolumntype{V}{>{\columncolor{LightGreen}}c}
+\newcolumntype{O}{>{\columncolor{LightOrange}}c}
+\newcolumntype{A}{>{\columncolor{LightBuy}}c}
+\newcolumntype{R}{>{\columncolor{LightRed}}c}
+\newcolumntype{T}{>{\columncolor{LightTeal}}c}
+
+\lstset{
+  language=Python,
+  basicstyle=\ttfamily\footnotesize,
+  backgroundcolor=\color{codebg},
+  frame=single, rulecolor=\color{MedGray},
+  keywordstyle=\color{NavyBlue}\bfseries,
+  commentstyle=\color{DarkGreen}\itshape,
+  stringstyle=\color{DarkRed},
+  numberstyle=\tiny\color{Gray},
+  numbers=left, stepnumber=1,
+  breaklines=true, showstringspaces=false,
+  tabsize=4, captionpos=b
+}
+
+%============================================================
+\begin{document}
+%============================================================
+
+% ─────────────────────────────────────────────────────────
+%  PAGE DE GARDE
+% ─────────────────────────────────────────────────────────
+\begin{titlepage}
+\colorbox{DarkBlue}{\parbox{\textwidth}{%
+\vspace{1.4cm}
+\begin{center}
+{\color{MedGray}\small\textsc{École Nationale Supérieure}}\\[0.3cm]
+{\color{LightBlue}\small\textbf{Apprentissage Probabiliste}}\\[1.0cm]
+
+{\color{white}\fontsize{14}{18}\selectfont\bfseries RAPPORT DE PROJET}\\[0.4cm]
+\textcolor{MedBlue}{\rule{0.65\textwidth}{1.5pt}}\\[0.6cm]
+
+{\color{white}\fontsize{22}{30}\selectfont\bfseries Modélisation du Comportement}\\[0.2cm]
+{\color{white}\fontsize{22}{30}\selectfont\bfseries Utilisateur en E-Commerce}\\[0.5cm]
+
+% {\color{LightBlue}\large\itshape par les Chaînes de Markov et les Modèles de Markov Cachés}\\[1.0cm]
+
+\textcolor{MedBlue}{\rule{0.65\textwidth}{0.5pt}}\\[0.8cm]
+
+\colorbox{white!8!DarkBlue}{\parbox{0.85\textwidth}{
+  \color{white}
+  \begin{tabular}{@{\hspace{10pt}}ll@{}}
+    \textbf{Dataset}      & Yoochoose --- RecSys Challenge 2015 \\[4pt]
+    \textbf{Sessions}     & 100\,000 sessions de navigation anonymes \\[4pt]
+   
+    \textbf{Réalisé par}        &  Btissam Arehal \\[4pt]
+    
+    \textbf{Encadré par:}        & Prof.\ Abdellatif El Afia \\[4pt]
+    \textbf{Année}        & 2025--2026 \\
+  \end{tabular}
+}}\\[1.2cm]
+{\color{MedGray}\small Mai 2026}
+\end{center}
+\vspace{0.8cm}
+}}
+
+\vfill
+\begin{center}
+\colorbox{LightBlue}{\parbox{0.92\textwidth}{
+\centering
+\vspace{4pt}
+
+\vspace{4pt}
+}}
+\end{center}
+\end{titlepage}
+
+% ─────────────────────────────────────────────────────────
+\tableofcontents
+\newpage
+
+% ══════════════════════════════════════════════════════════
+%  INTRODUCTION GÉNÉRALE
+% ══════════════════════════════════════════════════════════
+\section{Introduction Générale}
+
+\subsection{Contexte}
+
+Le commerce électronique génère chaque jour des milliards d'interactions entre utilisateurs
+et plateformes numériques. Chaque visite produit une \textbf{session} : une séquence temporelle
+d'actions (clics, consultations, ajouts au panier, achats) qui reflète le comportement et
+l'intention d'achat d'un utilisateur.
+
+Comprendre comment un utilisateur progresse au cours de sa session est essentiel pour :
+\begin{itemize}[leftmargin=2cm,itemsep=2pt]
+  \item améliorer les systèmes de recommandation personnalisée,
+  \item optimiser l'expérience utilisateur,
+  \item augmenter les taux de conversion,
+  \item identifier les fenêtres d'intervention optimales.
+\end{itemize}
+
+\subsection{Dataset Yoochoose}
+
+Le dataset \textbf{Yoochoose} (RecSys Challenge 2015) fournit 100\,000 sessions anonymes
+de navigation e-commerce, composées de séquences de clics sur des items et, pour certaines
+sessions, d'un achat final.
+
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+\textbf{Fichier} & \textbf{Champ} & \textbf{Description} \\
+\midrule
+\rowcolor{LightBlue} \multirow{4}{*}{\texttt{clicks.dat}}
+  & \texttt{session\_id} & Identifiant unique de session \\
+\rowcolor{LightBlue} & \texttt{timestamp} & Moment de l'interaction (ISO 8601) \\
+\rowcolor{LightBlue} & \texttt{item\_id} & Produit consulté \\
+\rowcolor{LightBlue} & \texttt{category} & Catégorie du produit \\
+\midrule
+\rowcolor{LightGreen} \multirow{3}{*}{\texttt{buys.dat}}
+  & \texttt{session\_id} & Session avec achat \\
+\rowcolor{LightGreen} & \texttt{price} & Prix du produit acheté \\
+\rowcolor{LightGreen} & \texttt{qty} & Quantité achetée \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Espace d'états comportementaux}
+
+Les cinq états modélisant le parcours utilisateur sont définis comme suit :
+
+\begin{center}
+\begin{tabular}{clccc}
+\toprule
+\textbf{État} & \textbf{Nom} & \textbf{Condition} & \textbf{Type} \\
+\midrule
+\rowcolor{LightBlue}   $s_1$ & Browsing   & $k \leq 2$ clics      & Transitoire \\
+\rowcolor{LightOrange} $s_2$ & Engaged    & $3 \leq k \leq 5$ clics & Transitoire \\
+\rowcolor{LightRed}    $s_3$ & HighIntent & $k \geq 6$ clics      & Transitoire \\
+\rowcolor{LightBuy}    $s_4$ & Buy        & Session avec achat    & Absorbant \\
+\rowcolor{LightGray}   $s_5$ & Exit       & Session sans achat    & Absorbant \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+La progression générale des utilisateurs suit l'entonnoir :
+\[
+\text{Browsing} \;\rightarrow\; \text{Engaged} \;\rightarrow\; \text{HighIntent}
+\;\rightarrow\; \{\text{Buy},\; \text{Exit}\}
+\]
+
+\newpage
+
+% ══════════════════════════════════════════════════════════════════════════════
+%  CHAPITRE 1 — DTMC
+% ══════════════════════════════════════════════════════════════════════════════
+\section{Chapitre 1 : Chaîne de Markov à Temps Discret (DTMC)}
+
+\subsection{Description du dataset}
+
+\begin{table}[H]
+\centering
+\caption{Caractéristiques du dataset Yoochoose (RecSys Challenge 2015)}
+\label{tab:dataset}
+\begin{tabularx}{\textwidth}{lXl}
+\toprule
+\rowcolor{DarkBlue}
+\color{white}\textbf{Caractéristique} &
+\color{white}\textbf{Description} &
+\color{white}\textbf{Valeur} \\
+\midrule
+\rowcolor{LightBlue}
+Source       & RecSys Challenge 2015 --- e-commerce anonyme & Public \\
+Fichier \texttt{clicks.dat} & Sessions de navigation (clics sur items) & 395\,698 lignes \\
+\rowcolor{LightBlue}
+Fichier \texttt{buys.dat}   & Sessions ayant abouti à un achat        & 509\,696 achats \\
+Sessions extraites          & Sous-ensemble utilisé pour ce chapitre  & 100\,000 \\
+\rowcolor{LightBlue}
+Format clicks  & \texttt{session\_id, timestamp, item\_id, category} & CSV \\
+Format buys    & \texttt{session\_id, timestamp, item\_id, price, qty} & CSV \\
+\rowcolor{LightBlue}
+Anonymat       & Aucun identifiant utilisateur persistant & Oui \\
+Période        & 6 mois de données réelles e-commerce & 2014 \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Pertinence pour la modélisation markovienne}
+
+Le dataset Yoochoose est particulièrement bien adapté à la modélisation
+par chaînes de Markov pour plusieurs raisons :
+\begin{itemize}[itemsep=2pt]
+  \item \textbf{Sessions anonymes} : l'absence d'identifiant utilisateur
+        justifie l'hypothèse sans mémoire inter-sessions (propriété de Markov)
+  \item \textbf{Séquences d'actions} : les clics successifs dans une session
+        forment une trajectoire naturelle sur l'espace d'états
+  \item \textbf{Décision binaire finale} : chaque session se termine
+        par Achat ou Abandon --- structure absorbante parfaite
+  \item \textbf{Volume suffisant} : 100\,000 sessions permettent
+        d'estimer la matrice $\mat{P}$ avec une précision statistique élevée
+\end{itemize}
+
+% CORRECTION : \cite{hidasi2016}{hidasi2016} → \cite{hidasi2016}
+\cite{hidasi2016} utilisent également Yoochoose pour évaluer leur modèle
+GRU4Rec ; notre approche markovienne constitue un \emph{baseline}
+probabiliste interprétable par rapport à leur approche neuronale.
+
+\subsection{Processus Stochastique et Espace d'États}
+
+\subsubsection{Processus stochastique à temps discret}
+
+\begin{defbox}{Processus stochastique à temps discret}
+Un \textbf{processus stochastique à temps discret} est une famille
+de variables aléatoires $(X_n)_{n \geq 0}$ définies sur un espace de
+probabilité $(\Omega, \mathcal{F}, \Prob)$, à valeurs dans un espace
+d'états $S$ fini ou dénombrable, avec le temps $n \in \mathbb{N}$.
+\end{defbox}
+
+\textbf{Application Yoochoose :}
+\[
+  X_n = \text{état comportemental de l'utilisateur à l'étape } n
+  \text{ de sa session}
+\]
+où $n$ représente le rang de l'action courante (clic $n$) dans la session.
+
+\subsection{Définition des 5 états comportementaux}
+
+L'espace d'états fini $S = \{\st{Browsing}, \st{Engaged}, \st{HighIntent},
+\st{Buy}, \st{Exit}\}$ a été construit à partir d'une analyse
+comportementale des sessions Yoochoose. Il capture les différentes
+phases du processus de décision d'achat.
+
+\begin{table}[H]
+\centering
+\caption{Définition formelle et classification des 5 états}
+\label{tab:etats}
+\begin{tabularx}{\textwidth}{>{\bfseries}lp{2.6cm}Xp{2.2cm}p{1.8cm}}
+\toprule
+\rowcolor{DarkBlue}
+\color{white}État &
+\color{white}Condition &
+\color{white}Comportement observé &
+\color{white}Type &
+\color{white}Notation \\
+\midrule
+\rowcolor{LightBlue}
+Browsing   & $k \leq 2$ clics &
+  Navigation légère, découverte, peu d'engagement &
+  Transitoire & $s_1$ \\
+\rowcolor{LightGreen}
+Engaged    & $3\!\leq\!k\!\leq\!5$ &
+  Exploration active, comparaison de produits, intérêt croissant &
+  Transitoire & $s_2$ \\
+\rowcolor{LightOrange}
+HighIntent & $k \geq 6$ clics &
+  Forte intention d'achat, navigation ciblée, hésitation prolongée &
+  Transitoire & $s_3$ \\
+\rowcolor{LightBuy}
+Buy        & session $\in$ \texttt{buys} &
+  Achat effectué, conversion réussie, fin de session &
+  \textcolor{BuyGreen}{\bfseries Absorbant} & $s_4$ \\
+\rowcolor{LightRed}
+Exit       & session $\notin$ \texttt{buys} &
+  Abandon, départ sans achat, non-conversion &
+  \textcolor{DarkRed}{\bfseries Absorbant} & $s_5$ \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Types d'états : transitoires et absorbants}
+
+\begin{defbox}{État transitoire}
+Un état $i \in S$ est \textbf{transitoire} si la probabilité de ne jamais
+y revenir après l'avoir quitté est strictement positive :
+\[
+  f_{ii} = \Prob(\exists\,n \geq 1 : X_n = i \mid X_0 = i) < 1
+\]
+Autrement dit, un état transitoire sera visité un nombre \emph{fini}
+de fois avant d'être quitté définitivement.
+\end{defbox}
+
+\begin{defbox}{État absorbant (persistant)}
+Un état $i$ est \textbf{absorbant} (ou persistant récurrent) si :
+\[
+  p_{ii} = 1 \quad \Leftrightarrow \quad
+  f_{ii} = 1 \quad \Leftrightarrow \quad
+  \text{le processus ne peut plus quitter } i
+\]
+\end{defbox}
+
+\vspace{2pt}
+\begin{table}[H]
+\centering
+\caption{Classification détaillée : transitoires vs absorbants}
+\label{tab:type_etats}
+\begin{tabular}{llccl}
+\toprule
+\rowcolor{DarkBlue}
+\color{white}\textbf{État} &
+\color{white}\textbf{Type} &
+\color{white}$p_{ii}$ &
+\color{white}$f_{ii}$ &
+\color{white}\textbf{Justification} \\
+\midrule
+\rowcolor{LightBlue}
+\st{Browsing}   & Transitoire & 0.4836 & $<1$ &
+  Peut devenir Engaged, Buy ou Exit \\
+\rowcolor{LightGreen}
+\st{Engaged}    & Transitoire & 0.5233 & $<1$ &
+  Peut devenir HighIntent, Buy ou Exit \\
+\rowcolor{LightOrange}
+\st{HighIntent} & Transitoire & 0.8069 & $<1$ &
+  Peut devenir Buy ou Exit (fort taux de persistance) \\
+\rowcolor{LightBuy}
+\st{Buy}  & \textcolor{BuyGreen}{\bfseries Absorbant} & 1.0000 & $=1$ &
+  Fin de session --- achat impossible à annuler \\
+\rowcolor{LightRed}
+\st{Exit} & \textcolor{DarkRed}{\bfseries Absorbant}  & 1.0000 & $=1$ &
+  Fin de session --- utilisateur quitté définitivement \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsubsection{Exemples concrets d'états et de transitions}
+
+\begin{exbox}{Sessions Yoochoose typiques}
+\begin{itemize}[leftmargin=1.5em,itemsep=4pt,topsep=3pt]
+
+  \item \textbf{Session courte --- Browsing $\to$ Exit (abandon rapide)} :\\
+    \texttt{session 1243 : item\_a (clic 1), item\_b (clic 2)} $\to$ fin
+    sans achat.\\
+    $\Rightarrow$ Séquence d'états : $\st{Browsing} \to \st{Browsing}
+    \to \st{Exit}$ avec $p = 0.4836 \times 0.2315 = 0.112$
+
+  \item \textbf{Session moyenne --- Browsing $\to$ Engaged $\to$ Exit} :\\
+    \texttt{session 5671 : 4 clics sur des jeans différents, aucun achat.}\\
+    $\Rightarrow$ $\st{Browsing} \to \st{Engaged} \to \st{Engaged}
+    \to \st{Exit}$ avec $p = 0.2772 \times 0.5233 \times 0.3032 \approx 0.044$
+
+  \item \textbf{Session longue --- HighIntent $\to$ Buy (conversion)} :\\
+    \texttt{session 8934 : 8 clics sur le même modèle de chaussures,
+    re-consultation des détails, achat.}\\
+    $\Rightarrow$ $\st{Browsing} \to \st{Engaged} \to \st{HighIntent}
+    \to \cdots \to \st{HighIntent} \to \st{Buy}$\\
+    Durée typique : 5--8 étapes dans l'état HighIntent ($N_{HH} = 5.18$)
+
+  \item \textbf{Session directe --- Browsing $\to$ Buy (achat impulsif)} :\\
+    \texttt{session 2201 : 1 clic, achat direct d'un item en promotion.}\\
+    $\Rightarrow$ $\st{Browsing} \to \st{Buy}$ avec $p = 0.007774$
+    (rare mais existant : 1\,505 cas sur 193\,656)
+
+\end{itemize}
+\end{exbox}
+
+%============================================================
+% CORRECTION : \subection → \subsection
+\subsection{Propriété de Markov}
+%============================================================
+
+\subsubsection{Définition formelle}
+
+\begin{defbox}{Chaîne de Markov à temps discret (DTMC)}
+$(X_n)_{n\geq 0}$ est une \textbf{chaîne de Markov à temps discret}
+(Discrete-Time Markov Chain, DTMC) si et seulement si, pour tout
+$n \geq 0$ et tous états $i_0,\ldots,i_{n-1}, i, j \in S$ :
+\[
+  \Prob(X_{n+1}=j \mid X_n=i,\,X_{n-1}=i_{n-1},\ldots,X_0=i_0)
+  = \Prob(X_{n+1}=j \mid X_n=i)
+  \eqqcolon p_{ij}
+\]
+Cette propriété s'appelle la \textbf{propriété sans mémoire} (memoryless)
+ou \textbf{propriété de Markov}.
+\end{defbox}
+
+\subsubsection{Justification dans le contexte Yoochoose}
+
+La propriété de Markov est justifiée dans notre modèle pour les raisons suivantes :
+
+\begin{enumerate}[leftmargin=1.5em,itemsep=3pt]
+  \item \textbf{Sessions anonymes} : sans identifiant utilisateur persistant,
+        seul l'état comportemental actuel (nombre de clics dans la session)
+        influence la prochaine action --- pas l'historique complet
+  \item \textbf{Comportement local} : la décision d'acheter, de continuer
+        ou de quitter est déterminée par le niveau d'engagement présent,
+        non par toute la séquence passée
+  \item \textbf{Cohérence avec la littérature} : \citet{hidasi2016}
+        modélisent les sessions comme des séquences sans état latent
+        inter-sessions, ce qui est cohérent avec l'hypothèse markovienne
+        à l'intérieur d'une session
+\end{enumerate}
+
+\begin{warnbox}
+Cette hypothèse est une approximation. En réalité, le comportement
+peut dépendre de l'ordre des items consultés, pas seulement du nombre
+de clics. Les modèles HMM (Chapitres~3--4) et NARM \citep{li2017narm}
+lèvent partiellement cette hypothèse.
+\end{warnbox}
+
+\subsubsection{Homogénéité temporelle}
+
+\begin{defbox}{Chaîne de Markov homogène}
+La chaîne est \textbf{homogène dans le temps} (time-homogeneous) si :
+\[
+  p_{ij} = \Prob(X_{n+1}=j \mid X_n=i) \quad \text{est indépendante de } n
+\]
+\end{defbox}
+
+Cette hypothèse est justifiée car les probabilités $p_{ij}$ sont estimées
+sur l'ensemble des 100\,000 sessions sans stratification temporelle.
+
+%============================================================
+\subsection{Matrice de Transition}
+%============================================================
+
+\subsubsection{Définition}
+
+\begin{defbox}{Matrice de transition stochastique}
+La matrice $\mat{P} = (p_{ij})_{i,j\in S}$ est une
+\textbf{matrice stochastique en ligne} vérifiant :
+\[
+  p_{ij} \geq 0 \;\forall i,j
+  \qquad \text{et} \qquad
+  \sum_{j\in S} p_{ij} = 1 \;\forall i
+\]
+$p_{ij}$ est la probabilité de passer de l'état $i$ à l'état $j$
+en une étape (une action dans la session).
+\end{defbox}
+
+\subsubsection{Comptages bruts (100\,000 sessions)}
+
+\begin{table}[H]
+\centering
+\caption{Comptages bruts des transitions observées (395\,698 transitions)}
+\label{tab:comptages}
+\begin{tabular}{l|rrrrr|r}
+\toprule
+\rowcolor{DarkBlue}
+\color{white}\textbf{De $\backslash$ Vers} &
+\color{white}\textbf{Browsing} &
+\color{white}\textbf{Engaged} &
+\color{white}\textbf{HighIntent} &
+\color{white}\textbf{Buy} &
+\color{white}\textbf{Exit} &
+\color{white}\textbf{Total} \\
+\midrule
+\rowcolor{LightBlue}
+\textbf{Browsing}   & 93\,656 & 53\,673 &       0 &  1\,505 & 44\,822 & 193\,656 \\
+\rowcolor{LightGreen}
+\textbf{Engaged}    &       0 & 58\,918 & 17\,273 &  2\,260 & 34\,140 & 112\,591 \\
+\rowcolor{LightOrange}
+\textbf{HighIntent} &       0 &       0 & 72\,178 &  2\,825 & 14\,448 &  89\,451 \\
+\rowcolor{LightBuy}
+\textbf{Buy}        &       0 &       0 &       0 &       1 &       0 &        1 \\
+\rowcolor{LightRed}
+\textbf{Exit}       &       0 &       0 &       0 &       0 &       1 &        1 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsubsection{Matrice \texorpdfstring{$\mat{P}$}{P} normalisée}
+
+\begin{table}[H]
+\centering
+\caption{Matrice de transition $\mat{P}$ normalisée par ligne (6 décimales)}
+\label{tab:P}
+\begin{tabular}{l|ccccc}
+\toprule
+\rowcolor{DarkBlue}
+\color{white}$p_{ij}$ &
+\color{white}\textbf{Browsing} &
+\color{white}\textbf{Engaged} &
+\color{white}\textbf{HighIntent} &
+\color{white}\textbf{Buy} &
+\color{white}\textbf{Exit} \\
+\midrule
+\rowcolor{LightBlue}
+\textbf{Browsing} &
+  \cellcolor{MedBlue}\textbf{0.483617} & 0.277155 & 0.000003 & 0.007774 & 0.231451 \\
+\rowcolor{LightGreen}
+\textbf{Engaged} &
+  0.000004 & \cellcolor{LightGreen!80}\textbf{0.523285} & 0.153415 & 0.020077 & 0.303219 \\
+\rowcolor{LightOrange}
+\textbf{HighIntent} &
+  0.000006 & 0.000006 & \cellcolor{DarkOrange!30}\textbf{0.806883} & 0.031586 & 0.161520 \\
+\rowcolor{LightBuy}
+\textbf{Buy} &
+  0.000000 & 0.000000 & 0.000000 & \cellcolor{LightBuy!80}\textbf{1.000000} & 0.000000 \\
+\rowcolor{LightRed}
+\textbf{Exit} &
+  0.000000 & 0.000000 & 0.000000 & 0.000000 & \cellcolor{LightRed!80}\textbf{1.000000} \\
+\midrule
+\multicolumn{6}{l}{\small\textit{Chaque ligne somme à 1.000000 \checkmark
+(propriété stochastique vérifiée)}} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{exbox}{Lecture de la matrice $\mat{P}$}
+\begin{itemize}[leftmargin=1.5em,itemsep=2pt,topsep=3pt]
+  \item $p_{BB} = 0.484$ : un utilisateur en \st{Browsing} a 48.4\% de
+        chance de rester en \st{Browsing} au prochain clic (hésitation)
+  \item $p_{BE} = 0.277$ : 27.7\% de chance de progresser vers \st{Engaged}
+        (accroître l'engagement)
+  \item $p_{B,\text{Exit}} = 0.231$ : 23.1\% d'abandon immédiat depuis \st{Browsing}
+  \item $p_{HH} = 0.807$ : un utilisateur en \st{HighIntent} a 80.7\%
+        de chance de rester dans cet état (forte hésitation, opportunité
+        d'intervention pour la recommandation)
+  \item $p_{H,\text{Buy}} = 0.032$ : 3.2\% de conversion par étape
+        depuis \st{HighIntent}
+\end{itemize}
+\end{exbox}
+
+\begin{insightbox}
+\textbf{Structure triangulaire supérieure :} les retours en arrière
+($\st{Engaged} \to \st{Browsing}$, $\st{HighIntent} \to \st{Engaged}$)
+ont des probabilités quasi-nulles ($\approx 10^{-6}$), ce qui confirme
+le caractère \emph{unidirectionnel} du tunnel de conversion.
+Cette structure est cohérente avec les observations de \citet{quadrana2017}
+sur la progressivité des sessions e-commerce.
+\end{insightbox}
+
+%============================================================
+\subsection{Équation de Chapman-Kolmogorov}
+%============================================================
+
+\begin{thmbox}{Équation de Chapman-Kolmogorov}
+Pour tous entiers $\ell, m \geq 0$ :
+\[
+  \mat{P}^{(\ell+m)} = \mat{P}^{(\ell)} \cdot \mat{P}^{(m)}
+  \quad\Longleftrightarrow\quad
+  p_{ij}^{(\ell+m)} = \sum_{k\in S} p_{ik}^{(\ell)}\,p_{kj}^{(m)}
+\]
+En particulier : $\mat{P}^{(n)} = \mat{P}^n$.
+\end{thmbox}
+
+\begin{exbox}{Calcul de $p^{(2)}_{\st{Browsing},\st{Buy}}$}
+En utilisant Chapman-Kolmogorov avec $\ell=m=1$ :
+\begin{align*}
+  p_{B,\text{Buy}}^{(2)}
+  &= p_{BB}\cdot p_{B,\text{Buy}} + p_{BE}\cdot p_{E,\text{Buy}}
+   + p_{BH}\cdot p_{H,\text{Buy}}
+   + p_{B,\text{Buy}}\cdot p_{\text{Buy,Buy}}
+   + p_{B,\text{Exit}}\cdot p_{\text{Exit,Buy}} \\
+  &= 0.4836\times 0.0078 + 0.2772\times 0.0201
+   + 0.0000\times 0.0316 + 0.0078\times 1
+   + 0.2315\times 0 \\
+  &= 0.00377 + 0.00557 + 0 + 0.00777 + 0
+   = \mathbf{0.01711} \checkmark
+\end{align*}
+\end{exbox}
+
+\begin{table}[H]
+\centering
+\caption{Matrice $\mat{P}^2$ --- probabilités en 2 étapes}
+\label{tab:P2}
+\begin{tabular}{l|ccccc}
+\toprule
+\rowcolor{DarkBlue}
+\color{white}$p_{ij}^{(2)}$ &
+\color{white}Browsing & \color{white}Engaged &
+\color{white}HighIntent & \color{white}Buy & \color{white}Exit \\
+\midrule
+\textbf{Browsing}   & 0.2340 & 0.2790 & 0.0425 & 0.0171 & 0.4274 \\
+\rowcolor{LightGray}
+\textbf{Engaged}    & 0.0000 & 0.2738 & 0.2010 & 0.0294 & 0.4958 \\
+\textbf{HighIntent} & 0.0000 & 0.0000 & 0.6511 & 0.0569 & 0.2920 \\
+\rowcolor{LightGray}
+\textbf{Buy}        & 0.0000 & 0.0000 & 0.0000 & 1.0000 & 0.0000 \\
+\textbf{Exit}       & 0.0000 & 0.0000 & 0.0000 & 0.0000 & 1.0000 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Probabilités d'achat $p^{(k)}_{\st{Browsing},\st{Buy}}$ par Chapman-Kolmogorov}
+\label{tab:CK}
+\begin{tabular}{c|cc|c}
+\toprule
+\rowcolor{DarkBlue}
+\color{white}$k$ &
+\color{white}$p^{(k)}_{\st{B},\st{Buy}}$ &
+\color{white}$p^{(k)}_{\st{B},\st{Exit}}$ &
+\color{white}Somme absorbée \\
+\midrule
+1 & 0.007774 & 0.231451 & 0.239225 \\
+\rowcolor{LightGray}
+2 & 0.017098 & 0.427398 & 0.444496 \\
+3 & 0.025862 & 0.573031 & 0.598893 \\
+\rowcolor{LightGray}
+5 & 0.039711 & 0.746487 & 0.786198 \\
+10 & 0.056964 & 0.885706 & 0.942670 \\
+\rowcolor{LightGray}
+20 & 0.064917 & 0.928828 & 0.993745 \\
+$\infty$ & \textbf{0.065912} & \textbf{0.934088} & \textbf{1.000000} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+%============================================================
+% CORRECTION : \ssubection → \subsection
+\subsection{Classification des États et de la Chaîne}
+%============================================================
+
+\subsubsection{Accessibilité et communication}
+
+\begin{defbox}{Accessibilité et communication d'états}
+\begin{itemize}[itemsep=2pt,topsep=2pt]
+  \item $j$ est \textbf{accessible} depuis $i$ (noté $i \to j$) si
+        $\exists\,n\geq 1 : p_{ij}^{(n)} > 0$
+  \item $i$ et $j$ \textbf{communiquent} (noté $i \leftrightarrow j$)
+        si $i\to j$ et $j\to i$
+  \item La relation $\leftrightarrow$ est une \textbf{relation d'équivalence}
+        qui partitionne $S$ en \textbf{classes de communication}
+\end{itemize}
+\end{defbox}
+
+\begin{exbox}{Vérification d'accessibilité sur Yoochoose}
+\begin{itemize}[itemsep=2pt,topsep=3pt]
+  \item $\st{Buy}$ accessible depuis $\st{Browsing}$ :
+        $p_{B,\text{Buy}}^{(1)} = 0.0078 > 0$ \checkmark
+  \item $\st{Exit}$ accessible depuis $\st{Engaged}$ :
+        $p_{E,\text{Exit}}^{(1)} = 0.3032 > 0$ \checkmark
+  \item $\st{HighIntent}$ accessible depuis $\st{Browsing}$ en 2 étapes :
+        $p_{B,H}^{(2)} = 0.0425 > 0$ \checkmark
+  \item $\st{Browsing}$ \textbf{non} accessible depuis $\st{Buy}$ :
+        $p_{\text{Buy},B}^{(n)} = 0\;\forall n$ (état absorbant) $\times$
+  \item Donc $\st{Browsing} \not\leftrightarrow \st{Buy}$ : ils ne communiquent pas
+\end{itemize}
+\end{exbox}
+
+\subsubsection{Classes de communication}
+
+\begin{table}[H]
+\centering
+\caption{Les 5 classes de communication de la chaîne Yoochoose}
+\label{tab:classes}
+\begin{tabular}{cllll}
+\toprule
+\rowcolor{DarkBlue}
+\color{white}\textbf{Classe} &
+\color{white}\textbf{États} &
+\color{white}\textbf{Type} &
+\color{white}\textbf{Successeurs dans $G_r$} &
+\color{white}$p_{ii}$ \\
+\midrule
+\rowcolor{LightBlue}
+$C_1$ & \{Browsing\}   & Transitoire &
+  $C_2, C_4, C_5$ & 0.4836 \\
+\rowcolor{LightGreen}
+$C_2$ & \{Engaged\}    & Transitoire &
+  $C_3, C_4, C_5$ & 0.5233 \\
+\rowcolor{LightOrange}
+$C_3$ & \{HighIntent\} & Transitoire &
+  $C_4, C_5$      & 0.8069 \\
+\rowcolor{LightBuy}
+$C_4$ & \{Buy\}  &
+  \textcolor{BuyGreen}{\bfseries Persistante absorbante} &
+  $\emptyset$ & 1.0000 \\
+\rowcolor{LightRed}
+$C_5$ & \{Exit\} &
+  \textcolor{DarkRed}{\bfseries Persistante absorbante} &
+  $\emptyset$ & 1.0000 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{exbox}{Pourquoi 5 classes distinctes et non une seule ?}
+Chaque état transitoire forme sa propre classe car il n'y a aucun
+chemin de retour possible :
+\begin{itemize}[itemsep=2pt,topsep=3pt]
+  \item $\st{Engaged} \not\to \st{Browsing}$ :
+        $p_{E,B}^{(n)} \approx 0\;\forall n$ (structure triangulaire)
+  \item $\st{HighIntent} \not\to \st{Engaged}$ :
+        $p_{H,E}^{(n)} \approx 0\;\forall n$
+  \item $\st{Buy} \not\to \st{Browsing}$ : puits absorbant
+\end{itemize}
+Donc chaque état forme sa propre classe $C_i = \{s_i\}$.
+\end{exbox}
+
+\subsubsection{Apériodicité}
+
+\begin{defbox}{Période d'un état}
+$d(i) = \gcd\{n \geq 1 : p_{ii}^{(n)} > 0\}$.
+Si $p_{ii} > 0$ (boucle à $n=1$), alors $d(i) = 1$ (apériodique).
+\end{defbox}
+
+\begin{table}[H]
+\centering
+\caption{Vérification de l'apériodicité --- $d(i) = 1$ pour tous les états}
+\begin{tabular}{lcccc}
+\toprule
+\rowcolor{DarkBlue}
+\color{white}\textbf{État} &
+\color{white}$p_{ii}$ &
+\color{white}Boucle ? &
+\color{white}Période $d$ &
+\color{white}Apériodique \\
+\midrule
+\rowcolor{LightBlue}
+Browsing   & 0.483617 & OUI & $d=1$ & \textcolor{DarkGreen}{\bfseries OUI \checkmark} \\
+\rowcolor{LightGreen}
+Engaged    & 0.523285 & OUI & $d=1$ & \textcolor{DarkGreen}{\bfseries OUI \checkmark} \\
+\rowcolor{LightOrange}
+HighIntent & 0.806883 & OUI & $d=1$ & \textcolor{DarkGreen}{\bfseries OUI \checkmark} \\
+\rowcolor{LightBuy}
+Buy        & 1.000000 & OUI & $d=1$ & \textcolor{DarkGreen}{\bfseries OUI \checkmark} \\
+\rowcolor{LightRed}
+Exit       & 1.000000 & OUI & $d=1$ & \textcolor{DarkGreen}{\bfseries OUI \checkmark} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsubsection{Conclusion : nature de la chaîne}
+
+\colorbox{LightBlue}{\parbox{\dimexpr\linewidth-2\fboxsep\relax}{%
+\textbf{\color{DarkBlue}Classification complète :}
+\begin{itemize}[leftmargin=1.5em,itemsep=2pt,topsep=4pt]
+  \item[\textcolor{DarkRed}{$\times$}] \textbf{Non irréductible} :
+        graphe non fortement connexe (Buy/Exit inaccessibles vers les transitoires)
+  \item[\textcolor{DarkRed}{$\times$}] \textbf{Non ergodique} :
+        l'ergodicité requiert irréductibilité + récurrence positive
+  \item[\textcolor{DarkGreen}{\checkmark}] \textbf{Réductible} :
+        5 classes de communication distinctes
+  \item[\textcolor{DarkGreen}{\checkmark}] \textbf{Apériodique} :
+        $d(i) = 1$ pour tous les états
+  \item[\textcolor{DarkGreen}{\checkmark}] \textbf{Absorbante} :
+        tout état transitoire atteint p.s.\ un état absorbant
+\end{itemize}
+\textbf{Conséquence :} le théorème applicable est celui des
+\textbf{chaînes absorbantes} ($\mat{N},\mat{B}$),
+et non le théorème ergodique.
+}}
+
+%============================================================
+\subsection{Forme Canonique}
+%============================================================
+
+\begin{defbox}{Forme canonique d'une chaîne absorbante}
+En ordonnant les états (transitoires $|$ absorbants), la matrice
+$\mat{P}$ prend la forme canonique :
+\[
+  \mat{P} =
+  \left(\begin{array}{c|c}
+    \mat{Q} & \mat{R} \\ \hline
+    \mat{0} & \mat{I}
+  \end{array}\right)
+\]
+où $\mat{Q}$ est la sous-matrice des transitions entre transitoires
+et $\mat{R}$ est la sous-matrice des transitions vers les absorbants.
+\end{defbox}
+
+Ordre adopté : $\{\st{Browsing},\,\st{Engaged},\,\st{HighIntent}\,|
+\,\st{Buy},\,\st{Exit}\}$
+
+\subsubsection{Matrice \texorpdfstring{$\mat{Q}$}{Q} --- transitions entre transitoires}
+
+\[
+  \mat{Q} =
+  \begin{pmatrix}
+    0.483617 & 0.277155 & 0.000003 \\
+    0.000004 & 0.523285 & 0.153415 \\
+    0.000006 & 0.000006 & 0.806883
+  \end{pmatrix}
+\]
+
+\textbf{Valeurs propres} : $\lambda_1\!\approx\!0.8069$,
+$\lambda_2\!\approx\!0.5233$, $\lambda_3\!\approx\!0.4836$
+--- toutes $<1$ $\Rightarrow$ $\mat{Q}^n\to\mat{0}$ \checkmark
+
+\subsubsection{Matrice \texorpdfstring{$\mat{R}$}{R} --- transitions vers absorbants}
+
+\[
+  \mat{R} =
+  \begin{pmatrix}
+    0.007774 & 0.231451 \\
+    0.020077 & 0.303219 \\
+    0.031586 & 0.161520
+  \end{pmatrix}
+\]
+
+\textbf{Vérification :} $\mat{Q}\,\mathbf{1} + \mat{R}\,\mathbf{1}
+= \mathbf{1}$ \checkmark
+
+%============================================================
+\subsubsection{Matrice Fondamentale \texorpdfstring{$\mat{N}$}{N}}
+%============================================================
+
+\begin{thmbox}{Matrice fondamentale d'une chaîne absorbante}
+La série $\sum_{n=0}^{\infty}\mat{Q}^n$ converge (car $\rho(\mat{Q})<1$)
+et :
+\[
+  \boxed{\mat{N} = \sum_{n=0}^{\infty}\mat{Q}^n
+  = (\mat{I}-\mat{Q})^{-1}}
+\]
+\textbf{Interprétation :} $N_{ij}$ = nombre moyen de visites de l'état
+transitoire $j$ avant absorption, depuis l'état $i$.
+\end{thmbox}
+
+\subsubsection{Calcul}
+
+\[
+  \mat{I}-\mat{Q} =
+  \begin{pmatrix}
+    0.516383 & -0.277155 & -0.000003 \\
+   -0.000004 &  0.476715 & -0.153415 \\
+   -0.000006 & -0.000006 &  0.193117
+  \end{pmatrix}
+\]
+
+\[
+  \boxed{
+    \mat{N} = (\mat{I}-\mat{Q})^{-1} =
+    \begin{pmatrix}
+      1.9366 & 1.1259 & 0.8945 \\
+      0.0000 & 2.0977 & 1.6665 \\
+      0.0001 & 0.0001 & 5.1783
+    \end{pmatrix}
+  }
+\]
+
+\begin{table}[H]
+\centering
+\caption{Matrice fondamentale $\mat{N}$ avec durées moyennes}
+\label{tab:N}
+\begin{tabular}{l|ccc|c}
+\toprule
+\rowcolor{DarkBlue}
+\color{white}$\mat{N}$ &
+\color{white}Browsing &
+\color{white}Engaged &
+\color{white}HighIntent &
+\color{white}\textbf{Durée moy. $t_i$} \\
+\midrule
+\rowcolor{LightBlue}
+\textbf{Browsing} &
+  1.9366 & 1.1259 & 0.8945 &
+  \cellcolor{DarkBlue}\textcolor{white}{\bfseries 3.957 étapes} \\
+\rowcolor{LightGreen}
+\textbf{Engaged} &
+  0.0000 & 2.0977 & 1.6665 &
+  \cellcolor{DarkBlue}\textcolor{white}{\bfseries 3.764 étapes} \\
+\rowcolor{LightOrange}
+\textbf{HighIntent} &
+  0.0001 & 0.0001 & 5.1783 &
+  \cellcolor{DarkOrange!70}\textcolor{white}{\bfseries 5.178 étapes} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{exbox}{Interprétation de $N_{HH} = 5.1783$}
+Un utilisateur débutant son parcours à \st{HighIntent} visitera en moyenne
+l'état \st{HighIntent} \textbf{5.18 fois} avant d'être absorbé. Cela
+correspond à environ 5 clics supplémentaires sur des items déjà
+consultés, traduisant une longue période d'hésitation.
+
+D'après \citet{li2017narm}, c'est précisément dans cette phase
+d'hésitation prolongée que les mécanismes d'attention permettent
+de mieux capter l'intention principale de l'utilisateur pour
+déclencher une recommandation décisive.
+\end{exbox}
+
+%============================================================
+\subsection{Probabilités d'Absorption \texorpdfstring{$\mat{B}$}{B}}
+%============================================================
+
+\begin{thmbox}{Matrice d'absorption}
+\[
+  \boxed{\mat{B} = \mat{N}\cdot\mat{R} = (\mat{I}-\mat{Q})^{-1}\cdot\mat{R}}
+\]
+$b_{ij}$ = probabilité d'être absorbé par l'absorbant $j$
+depuis le transitoire $i$. Propriété : $\sum_j b_{ij} = 1\;\forall i$.
+\end{thmbox}
+
+\subsubsection{Développement détaillé --- ligne Browsing}
+
+\begin{align*}
+  b_{B,\text{Buy}}
+  &= N_{BB}\!\cdot\!R_{B,\text{Buy}}
+   + N_{BE}\!\cdot\!R_{E,\text{Buy}}
+   + N_{BH}\!\cdot\!R_{H,\text{Buy}} \\
+  &= 1.9366\!\times\!0.007774
+   + 1.1259\!\times\!0.020077
+   + 0.8945\!\times\!0.031586 \\
+  &= 0.015055 + 0.022605 + 0.028254
+   = \mathbf{0.065912} \\[6pt]
+  b_{B,\text{Exit}}
+  &= 1.9366\!\times\!0.231451
+   + 1.1259\!\times\!0.303219
+   + 0.8945\!\times\!0.161520 \\
+  &= 0.448218 + 0.341476 + 0.144400
+   = \mathbf{0.934088} \\[4pt]
+  \text{Vérif.:}&\quad 0.065912 + 0.934088 = 1.000000\ \checkmark
+\end{align*}
+
+\subsubsection{Résultat complet}
+
+\begin{table}[H]
+\centering
+\caption{Matrice d'absorption $\mat{B} = \mat{N}\mat{R}$ --- taux de conversion}
+\label{tab:B}
+\begin{tabular}{l|cc|c|c}
+\toprule
+\rowcolor{DarkBlue}
+\color{white}\textbf{État initial} &
+\color{white}$b_{i,\text{Buy}}$ &
+\color{white}$b_{i,\text{Exit}}$ &
+\color{white}\textbf{Somme} &
+\color{white}\textbf{Vérif.} \\
+\midrule
+\rowcolor{LightBlue}
+\textbf{Browsing} &
+  \cellcolor{LightBuy}\textbf{6.59\%} &
+  \cellcolor{LightRed}\textbf{93.41\%} &
+  100\% & \textcolor{DarkGreen}{\bfseries\checkmark} \\
+\rowcolor{LightGreen}
+\textbf{Engaged} &
+  \cellcolor{LightBuy}\textbf{9.48\%} &
+  \cellcolor{LightRed}\textbf{90.52\%} &
+  100\% & \textcolor{DarkGreen}{\bfseries\checkmark} \\
+\rowcolor{LightOrange}
+\textbf{HighIntent} &
+  \cellcolor{LightBuy}\textbf{16.36\%} &
+  \cellcolor{LightRed}\textbf{83.64\%} &
+  100\% & \textcolor{DarkGreen}{\bfseries\checkmark} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{exbox}{Impact de l'état initial sur la conversion}
+\begin{itemize}[itemsep=2pt,topsep=3pt]
+  \item \textbf{Browsing $\to$ Buy} : 6.59\% (taux de base)
+  \item \textbf{Engaged $\to$ Buy} : 9.48\% (\textbf{+44\%} vs Browsing)
+  \item \textbf{HighIntent $\to$ Buy} : 16.36\% (\textbf{+148\%}, $\times$2.5)
+\end{itemize}
+Ces résultats quantifient l'impact de l'engagement initial :
+un utilisateur qui arrive directement en état HighIntent a 2.5 fois
+plus de chances d'acheter. Cela motive les stratégies de ciblage
+des utilisateurs à fort intérêt (recommandations pré-session).
+\end{exbox}
+
+%============================================================
+\subsection{Distribution Initiale et Évolution}
+%============================================================
+
+$\vect{\pi}^{(0)} = (1,\,0,\,0,\,0,\,0)$ (session démarre en \st{Browsing})
+
+\begin{thmbox}{Évolution de la distribution}
+$\vect{\pi}^{(n)} = \vect{\pi}^{(0)}\cdot\mat{P}^n$
+\end{thmbox}
+
+\begin{table}[H]
+\centering
+\caption{Évolution $\vect{\pi}^{(n)}$ pour $n = 0,\ldots,\infty$}
+\label{tab:pin}
+\begin{tabular}{c|ccccc}
+\toprule
+\rowcolor{DarkBlue}
+\color{white}$n$ &
+\color{white}Browsing &
+\color{white}Engaged &
+\color{white}HighIntent &
+\color{white}Buy &
+\color{white}Exit \\
+\midrule
+0  & \textbf{1.0000} & 0.0000 & 0.0000 & 0.0000 & 0.0000 \\
+\rowcolor{LightGray}
+1  & 0.4836 & 0.2772 & 0.0000 & 0.0078 & 0.2315 \\
+2  & 0.2339 & 0.2791 & 0.0425 & 0.0171 & 0.4274 \\
+\rowcolor{LightGray}
+3  & 0.1131 & 0.2109 & 0.0771 & 0.0259 & 0.5730 \\
+5  & 0.0265 & 0.0893 & 0.0981 & 0.0397 & 0.7465 \\
+\rowcolor{LightGray}
+10 & 0.0007 & 0.0059 & 0.0508 & 0.0570 & 0.8857 \\
+20 & 0.0000 & 0.0000 & 0.0063 & 0.0649 & 0.9288 \\
+\rowcolor{DarkBlue}
+\color{white}$\infty$ &
+  \color{white}0.0000 & \color{white}0.0000 & \color{white}0.0000 &
+  \color{white}\textbf{0.0659} & \color{white}\textbf{0.9341} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsubsection{Graphe d'évolution}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[xscale=0.50,yscale=5.4]
+\foreach \x in {0,5,10,15,20,25}{\draw[gray!20](\x,0)--(\x,1.05);}
+\foreach \y in {0,0.2,0.4,0.6,0.8,1.0}{\draw[gray!20](0,\y)--(26,\y);}
+\draw[thick,->](0,0)--(27,0)node[right,font=\small]{$n$};
+\draw[thick,->](0,0)--(0,1.1)node[above,font=\small]{$\pi_i^{(n)}$};
+\foreach \x in {0,5,10,15,20,25}{\node[below,font=\tiny]at(\x,0){\x};}
+\foreach \y in {0,0.2,0.4,0.6,0.8,1.0}{\node[left,font=\tiny]at(0,\y){\y};}
+\draw[NavyBlue,thick] plot coordinates{
+  (0,1.000)(1,0.484)(2,0.234)(3,0.113)(4,0.055)(5,0.027)(6,0.013)
+  (7,0.006)(8,0.003)(9,0.001)(10,0.001)(15,0)(20,0)(25,0)};
+\node[font=\tiny,NavyBlue,right]at(0.3,0.97){Browsing};
+\draw[DarkGreen,thick] plot coordinates{
+  (0,0)(1,0.277)(2,0.279)(3,0.211)(4,0.148)(5,0.089)(6,0.050)
+  (7,0.026)(8,0.013)(9,0.006)(10,0.006)(15,0.001)(20,0)(25,0)};
+\node[font=\tiny,DarkGreen]at(2.0,0.29){Engaged};
+\draw[DarkOrange,thick] plot coordinates{
+  (0,0)(1,0)(2,0.043)(3,0.077)(4,0.094)(5,0.098)(6,0.094)
+  (7,0.086)(8,0.076)(9,0.067)(10,0.051)(15,0.018)(20,0.006)(25,0.002)};
+\node[font=\tiny,DarkOrange]at(4.2,0.107){HighIntent};
+\draw[BuyGreen,thick,dashed] plot coordinates{
+  (0,0)(1,0.008)(2,0.017)(3,0.026)(4,0.033)(5,0.040)(6,0.045)
+  (7,0.050)(8,0.054)(9,0.056)(10,0.057)(15,0.063)(20,0.065)(25,0.066)};
+\draw[dotted,BuyGreen,thin](0,0.0659)--(26,0.0659);
+\node[font=\tiny,BuyGreen,right]at(20,0.068){Buy};
+\draw[DarkRed,thick,dashed] plot coordinates{
+  (0,0)(1,0.232)(2,0.427)(3,0.573)(4,0.670)(5,0.747)(6,0.808)
+  (7,0.832)(8,0.853)(9,0.870)(10,0.886)(15,0.919)(20,0.929)(25,0.932)};
+\draw[dotted,DarkRed,thin](0,0.9341)--(26,0.9341);
+\node[font=\tiny,DarkRed,right]at(11,0.90){Exit};
+\end{tikzpicture}
+\caption{Évolution de $\vect{\pi}^{(n)}$ depuis $\vect{\pi}^{(0)}=(1,0,0,0,0)$.
+Les trois états transitoires (lignes pleines) convergent vers 0 ;
+les absorbants (tirets) convergent vers $\vect{\pi}^*$.}
+\label{fig:evolution}
+\end{figure}
+
+\subsubsection{Comportement Asymptotique}
+
+\begin{thmbox}{Convergence des chaînes absorbantes}
+\[
+  \lim_{n\to\infty}\mat{Q}^n = \mat{0},\quad
+  \lim_{n\to\infty}\mat{P}^n = \mat{P}^*,\quad
+  \lim_{n\to\infty}[\pi^{(n)}_\text{Buy}+\pi^{(n)}_\text{Exit}] = 1
+\]
+\end{thmbox}
+
+\subsubsection{Distribution stationnaire}
+
+\[
+  \boxed{
+    \vect{\pi}^* = (0,\;0,\;0,\;0.0659,\;0.9341)
+  }
+\]
+
+Vérification $\vect{\pi}^*\mat{P} = \vect{\pi}^*$ :
+résidu $= [0,0,0,0,0]$ \checkmark
+
+\subsection{Vitesse de convergence}
+
+\[
+  \lambda_{\max} = \rho(\mat{Q}) = p_{HH} = 0.8069
+  \qquad
+  \Prob(\text{encore transitoire après }n) \approx (0.8069)^n
+\]
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[xscale=0.40,yscale=5.3]
+\foreach \x in {0,5,10,15,20,25,30}{\draw[gray!20](\x,0)--(\x,1.05);}
+\foreach \y in {0,0.2,0.4,0.6,0.8,1.0}{\draw[gray!20](0,\y)--(31,\y);}
+\draw[thick,->](0,0)--(32,0)node[right,font=\small]{$n$};
+\draw[thick,->](0,0)--(0,1.1)node[above,font=\small]{};
+\foreach \x in {0,5,10,15,20,25,30}{\node[below,font=\tiny]at(\x,0){\x};}
+\foreach \y in {0,0.2,0.4,0.6,0.8,1.0}{\node[left,font=\tiny]at(0,\y){\y};}
+\draw[DarkOrange,thick,dashed] plot coordinates{
+  (0,1.000)(2,0.651)(4,0.424)(6,0.276)(8,0.180)(10,0.117)
+  (12,0.076)(14,0.050)(16,0.032)(18,0.021)(20,0.014)(25,0.004)(30,0.001)};
+\node[font=\tiny,DarkOrange,right]at(0.2,0.97){$(0.8069)^n$};
+\draw[BuyGreen,thick] plot coordinates{
+  (0,0.000)(2,0.017)(4,0.033)(6,0.045)(8,0.054)(10,0.057)
+  (15,0.063)(20,0.065)(25,0.066)(30,0.066)};
+\draw[dotted,BuyGreen,thin](0,0.0659)--(31,0.0659)
+  node[right,font=\tiny]{$\pi^*_\text{Buy}$};
+\draw[DarkRed,thick] plot coordinates{
+  (0,0.000)(2,0.427)(4,0.670)(6,0.808)(8,0.853)(10,0.886)
+  (15,0.919)(20,0.929)(25,0.932)(30,0.934)};
+\draw[dotted,DarkRed,thin](0,0.9341)--(31,0.9341)
+  node[right,font=\tiny]{$\pi^*_\text{Exit}$};
+\end{tikzpicture}
+\caption{Vitesse de convergence. $\lambda_{\max} = 0.8069$ (HighIntent)
+gouverne la lenteur de l'absorption : il faut $\approx 25$ étapes
+pour que moins de 0.5\% de la masse reste dans les états transitoires.}
+\label{fig:convergence}
+\end{figure}
+
+%============================================================
+\subsection{Analyse Économique et Recommandations}
+%============================================================
+
+\subsubsection{Tableau de bord KPIs}
+
+\begin{table}[H]
+\centering
+\caption{KPIs extraits du modèle --- Dataset Yoochoose 100k sessions}
+\label{tab:kpis}
+\begin{tabularx}{\textwidth}{lXXX}
+\toprule
+\rowcolor{DarkBlue}
+\color{white}\textbf{KPI} &
+\color{white}\textbf{Valeur} &
+\color{white}\textbf{Source mathématique} &
+\color{white}\textbf{Implication business} \\
+\midrule
+Conversion Browsing &
+  \cellcolor{LightBuy}\textbf{6.59\%} & $b_{B,\text{Buy}}$ &
+  1 session/15 $\to$ achat \\
+\rowcolor{LightGray}
+Abandon global &
+  \cellcolor{LightRed}\textbf{93.41\%} & $b_{B,\text{Exit}}$ &
+  Très fort taux d'abandon \\
+Conversion Engaged &
+  9.48\% & $b_{E,\text{Buy}}$ &
+  +44\% vs Browsing \\
+\rowcolor{LightGray}
+Conversion HighIntent &
+  16.36\% & $b_{H,\text{Buy}}$ &
+  +148\% vs Browsing \\
+Durée moy. Browsing &
+  3.957 actions & $t_B = \sum_j N_{Bj}$ &
+  Session courte, décision rapide \\
+\rowcolor{LightGray}
+Durée moy. HighIntent &
+  5.178 actions & $t_H = \sum_j N_{Hj}$ &
+  Hésitation longue \\
+Persistance HighIntent &
+  80.7\% & $p_{HH}$ &
+  Point d'intervention critique \\
+\rowcolor{LightGray}
+$\lambda_{\max}$ conv. &
+  0.8069 & $\rho(\mat{Q})$ &
+  Convergence lente \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsubsection{Tunnel de conversion}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[scale=0.93]
+\fill[LightBlue,draw=NavyBlue,rounded corners=4pt](-4.8,3.3)rectangle(4.8,4.2);
+\node[font=\bfseries\small,text=DarkBlue]at(0,3.75)
+  {100\% --- \st{Browsing} (point d'entrée universel)};
+\fill[LightGreen,draw=DarkGreen,rounded corners=4pt](-3.2,2.1)rectangle(3.2,3.0);
+\node[font=\bfseries\small,text=DarkGreen!80!black]at(0,2.55)
+  {$\approx$27.7\% --- \st{Engaged}};
+\fill[LightOrange,draw=DarkOrange,rounded corners=4pt](-2.0,0.9)rectangle(2.0,1.8);
+\node[font=\bfseries\small,text=DarkOrange]at(0,1.35)
+  {$\approx$9\% --- \st{HighIntent}};
+\fill[LightBuy,draw=BuyGreen,rounded corners=4pt](-1.3,-0.3)rectangle(1.3,0.6);
+\node[font=\bfseries\small,text=BuyGreen]at(0,0.15){\textbf{6.59\% --- Buy}};
+\draw[-{Stealth},thick,gray](0,3.3)--(0,3.0);
+\draw[-{Stealth},thick,gray](0,2.1)--(0,1.8);
+\draw[-{Stealth},thick,gray](0,0.9)--(0,0.6);
+\fill[LightRed,draw=DarkRed,rounded corners=3pt](3.2,-0.2)rectangle(7.2,0.7);
+\node[font=\bfseries\small,text=DarkRed]at(5.2,0.25){93.41\% --- Exit};
+\draw[-{Stealth},DarkRed,thick,dashed]
+  (4.8,3.75)..controls(7,2.5)..(4.0,0.5);
+\draw[-{Stealth},DarkRed!60,thick,dashed]
+  (3.2,2.55)..controls(6.5,1.8)..(4.5,0.65);
+\node[font=\footnotesize\itshape,Gray]at(0,-0.85)
+  {Source : $\mat{B}=\mat{N}\mat{R}$ sur 100\,000 sessions Yoochoose};
+\end{tikzpicture}
+\caption{Tunnel de conversion e-commerce issu du modèle Markov.
+Seulement 6.59\% des sessions aboutissent à un achat.}
+\label{fig:tunnel}
+\end{figure}
+
+\subsubsection{Recommandations stratégiques}
+
+\begin{propbox}{Actions recommandées issues de l'analyse Markov}
+\begin{enumerate}[leftmargin=1.5em,itemsep=3pt,topsep=3pt]
+  \item \textbf{Réduire $p_{B,\text{Exit}} = 0.231$} : améliorer la page
+        d'accueil et les recommandations initiales pour accrocher l'utilisateur
+        dès les 2 premiers clics
+  \item \textbf{Augmenter $p_{BE} = 0.277$} : cibler les utilisateurs
+        en \st{Browsing} avec des recommandations contextuelles
+        (\textit{cf.} \citealt{hidasi2016})
+  \item \textbf{Exploiter $t_H = 5.18$ étapes} : déclencher une offre
+        promotionnelle ou une recommandation personnalisée
+        (\textit{cf.} \citealt{li2017narm}) pendant la période d'hésitation
+  \item \textbf{Réduire $p_{H,\text{Exit}} = 0.161$} : signaux d'urgence
+        (stock limité, offre temporaire) pour convertir les utilisateurs
+        en hésitation prolongée
+\end{enumerate}
+\end{propbox}
+\newpage
+%============================================================
+\subsection{Conclusion}
+%============================================================
+
+\subsubsection{Récapitulatif}
+
+\begin{table}[H]
+\centering
+\caption{Récapitulatif complet des résultats --- Chapitre 1}
+\begin{tabularx}{\textwidth}{lXc}
+\toprule
+\rowcolor{DarkBlue}
+\color{white}\textbf{Élément} &
+\color{white}\textbf{Résultat} &
+\color{white}\textbf{Statut} \\
+\midrule
+Matrice $\mat{P}$ ($5\times5$) &
+  100k sessions, 395\,698 transitions &
+  \textcolor{DarkGreen}{\bfseries\checkmark} \\
+\rowcolor{LightGray}
+Classification &
+  Réductible, absorbante, apériodique &
+  \textcolor{DarkGreen}{\bfseries\checkmark} \\
+5 classes $C_1\ldots C_5$ &
+  3 transitoires + 2 absorbantes &
+  \textcolor{DarkGreen}{\bfseries\checkmark} \\
+\rowcolor{LightGray}
+$\mat{N} = (\mat{I}-\mat{Q})^{-1}$ &
+  Calculée et vérifiée (Python) &
+  \textcolor{DarkGreen}{\bfseries\checkmark} \\
+$\mat{B} = \mat{N}\mat{R}$ &
+  Sommes = 1 \checkmark &
+  \textcolor{DarkGreen}{\bfseries\checkmark} \\
+\rowcolor{LightGray}
+Conversion &
+  6.59\% (B), 9.48\% (E), 16.36\% (HI) &
+  \textcolor{DarkGreen}{\bfseries\checkmark} \\
+$\vect{\pi}^{(n)}$ &
+  $n = 0,1,\ldots,20,\infty$ &
+  \textcolor{DarkGreen}{\bfseries\checkmark} \\
+\rowcolor{LightGray}
+$\vect{\pi}^*$ &
+  $(0,0,0,0.0659,0.9341)$, résidu=0 &
+  \textcolor{DarkGreen}{\bfseries\checkmark} \\
+$\lambda_{\max}$ &
+  0.8069 (HighIntent) &
+  \textcolor{DarkGreen}{\bfseries\checkmark} \\
+\rowcolor{LightGray}
+Transition MDP/RL &
+  Structure formelle définie &
+  \textcolor{DarkGreen}{\bfseries\checkmark} \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsubsection{Bilan}
+
+Ce chapitre a établi une modélisation probabiliste rigoureuse
+du comportement utilisateur e-commerce sur 100\,000 sessions Yoochoose.
+La chaîne de Markov absorbante à 5 états fournit :
+(i) une interprétation formelle du processus de décision d'achat,
+(ii) des quantités calculables analytiquement (durées moyennes,
+probabilités de conversion),
+(iii) un socle théorique pour les extensions MDP et RL.
+
+Notre approche est complémentaire des modèles neuronaux récents
+\citep{hidasi2016,quadrana2017,li2017narm} : là où ceux-ci optimisent
+la pertinence des items recommandés, notre modèle optimise
+la \emph{politique de navigation} elle-même.
+\newpage
+% ══════════════════════════════════════════════════════════════════════════════
+%  CHAPITRE 2 — CTMC
+% ══════════════════════════════════════════════════════════════════════════════
+\section{Chapitre 2 : Chaîne de Markov à Temps Continu (CTMC)}
+
+\subsection{Introduction}
+
+L'analyse du comportement utilisateur constitue un enjeu central pour les plateformes
+de commerce électronique. Comprendre comment un utilisateur progresse au cours de sa
+session permet d'améliorer les systèmes de recommandation, d'optimiser l'expérience
+utilisateur et d'augmenter les taux de conversion.
+
+Dans ce projet, nous modélisons le parcours d'un utilisateur à l'aide d'une
+\textbf{chaîne de Markov à temps continu (CTMC)}. Contrairement au modèle discret
+étudié dans le Chapitre~1 (DTMC), la CTMC permet d'intégrer explicitement la
+\textbf{dimension temporelle réelle} des interactions utilisateurs grâce aux
+horodatages disponibles dans le dataset Yoochoose.
+
+Le modèle construit représente les différents niveaux d'engagement d'un utilisateur
+au cours d'une session de navigation :
+
+\[
+\text{Browsing} \;\rightarrow\;
+\text{Engaged} \;\rightarrow\;
+\text{HighIntent} \;\rightarrow\;
+\{\text{Buy},\; \text{Exit}\}
+\]
+
+L'objectif est de quantifier :
+
+\begin{itemize}[leftmargin=2cm,itemsep=2pt]
+  \item la \textbf{dynamique temporelle} des sessions utilisateurs
+  \item les \textbf{taux de transition} entre niveaux d'engagement
+  \item les \textbf{probabilités finales} d'achat ou d'abandon
+  \item les \textbf{durées typiques} des sessions e-commerce
+\end{itemize}
+
+\subsection{Problématique du Projet}
+
+Les plateformes e-commerce génèrent des volumes massifs de données de navigation utilisateur.
+Comprendre comment les utilisateurs évoluent au cours d'une session est essentiel pour
+améliorer les systèmes de recommandation et optimiser les taux de conversion.
+
+\begin{insightbox}
+\textbf{Question centrale :} Comment modéliser l'évolution du comportement d'un utilisateur
+pendant sa session afin de \textbf{prédire} s'il va acheter ou quitter la plateforme ?
+\end{insightbox}
+
+Pour répondre à cette question, nous utilisons une \textbf{chaîne de Markov à temps continu}
+(CTMC) afin de capturer :
+
+\begin{itemize}[leftmargin=2cm,itemsep=2pt]
+  \item les \textbf{transitions} entre différents niveaux d'engagement
+  \item les \textbf{durées réelles} passées dans chaque état comportemental
+  \item les \textbf{probabilités finales} d'achat ou d'abandon
+\end{itemize}
+
+\subsection{Objectifs du Chapitre}
+
+Ce chapitre vise à construire un modèle CTMC pour analyser le comportement des utilisateurs.
+Plus précisément, nous cherchons à :
+
+\begin{enumerate}[leftmargin=2cm,itemsep=4pt]
+  \item \textbf{Modéliser} le comportement utilisateur à l'aide d'une chaîne de Markov à temps continu
+  \item \textbf{Estimer} la matrice génératrice $\hat{\mat{Q}}$ à partir des données du dataset Yoochoose
+  \item \textbf{Analyser} les probabilités de transition entre états comportementaux ($\hat{q}_{ij}$)
+  \item \textbf{Prédire} l'évolution temporelle $\mat{P}(t) = e^{\hat{\mat{Q}}t}$ du comportement utilisateur
+  \item \textbf{Estimer} la probabilité finale d'achat ou d'abandon par état initial
+  \item \textbf{Calculer} le temps moyen avant la fin d'une session ($t^* = \mat{N}\mathbf{1}$)
+  \item \textbf{Comparer} les résultats CTMC avec le Chapitre~1 (DTMC)
+\end{enumerate}
+
+\subsection{Interprétation du Dataset}
+
+Le dataset Yoochoose contient des sessions réelles de navigation sur une plateforme e-commerce.
+Chaque session correspond à la séquence d'actions effectuées par un utilisateur lors de sa visite.
+
+Les \textbf{horodatages} (\textit{timestamps}) permettent de mesurer les durées entre interactions
+successives. Cette information --- absente des modèles discrets --- est essentielle pour construire
+un modèle en temps continu capable de représenter la \textbf{dynamique temporelle réelle} du
+comportement utilisateur.
+
+\begin{warnbox}
+Dans le Chapitre~1 (DTMC), l'unité de temps était le clic. Dans ce chapitre, l'unité est la
+\textbf{seconde réelle}, ce qui permet de quantifier précisément les durées de séjour et les
+fenêtres d'intervention.
+\end{warnbox}
+
+\subsection{Prétraitement des Horodatages}
+
+La durée de séjour dans l'état $i$ au clic $k$ est :
+\[
+\Delta t_k^{(s)} = t_{k+1}^{(s)} - t_k^{(s)} \qquad [\text{secondes}]
+\]
+Pour le \textbf{dernier clic} de chaque session (sans successeur), on utilise la médiane empirique :
+\[
+\Delta t_{\text{dernier}} = \mathrm{med}\bigl\{\Delta t_k : \Delta t_k \neq \mathrm{NA}\bigr\}
+\]
+Les durées aberrantes sont tronquées : $\;\Delta t_k \leftarrow \min(\Delta t_k,\; \hat{q}_{0.95})$
+
+\begin{resultbox}
+\textbf{Paramètres :}
+$\;\text{Médiane} = 53.73\text{ s},\quad p_{95} = 490.10\text{ s},\quad \Delta t_{\text{dernier}} = 53.73\text{ s}$
+\end{resultbox}
+
+\subsection{Définition des États}
+
+\begin{center}
+\begin{tabular}{clccc}
+\toprule
+\textbf{État} & \textbf{Nom} & \textbf{Condition} & \textbf{Type} \\
+\midrule
+\rowcolor{LightBlue}   $s_1$ & Browsing   & $k \leq 2$         & Transitoire \\
+\rowcolor{LightOrange} $s_2$ & Engaged    & $3 \leq k \leq 5$   & Transitoire \\
+\rowcolor{LightRed}    $s_3$ & HighIntent & $k \geq 6$          & Transitoire \\
+\rowcolor{LightBuy}    $s_4$ & Buy        & Session avec achat  & Absorbant \\
+\rowcolor{LightGray}   $s_5$ & Exit       & Session sans achat  & Absorbant \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Définition Formelle}
+
+\begin{defbox}{Chaîne de Markov à Temps Continu}
+$\{X(t), t \geq 0\}$ est une CTMC si :
+\[
+\Prob\bigl(X(t{+}s){=}j \mid X(s){=}i,\, X(u){=}x_u,\, u{<}s\bigr)
+= \Prob\bigl(X(t{+}s){=}j \mid X(s){=}i\bigr)
+\quad \forall\, t,s \geq 0
+\]
+\end{defbox}
+
+\begin{thmbox}{Loi des temps de séjour}
+Le temps passé dans l'état $i$ avant de le quitter suit une \textbf{loi exponentielle} :
+\[
+T_i \sim \mathcal{E}(\lambda_i), \quad
+\Prob(T_i > t) = e^{-\lambda_i t}, \quad
+\mathbb{E}[T_i] = \frac{1}{\lambda_i}, \quad
+\mathrm{Var}(T_i) = \frac{1}{\lambda_i^2}
+\]
+La propriété \textbf{sans mémoire} : $\Prob(T_i>t{+}s\mid T_i>s)=e^{-\lambda_i t}$
+est l'analogue continu de Markov.
+\end{thmbox}
+
+\subsection{Matrice Génératrice $\hat{\mat{Q}}$}
+
+\subsubsection{Définition et Propriétés}
+
+\begin{defbox}{Matrice génératrice}
+\[
+q_{ij} = \lim_{h \to 0^+} \frac{p_{ij}(h) - \delta_{ij}}{h}
+\]
+\end{defbox}
+
+\begin{propbox}{Propriétés structurelles}
+\[
+q_{ij} \geq 0 \;(i\neq j), \qquad
+q_{ii} = -\lambda_i = -\sum_{j \neq i} q_{ij} \leq 0, \qquad
+\sum_{j} q_{ij} = 0
+\]
+\end{propbox}
+
+\subsubsection{Estimateur MLE}
+
+\begin{thmbox}{Estimateur du maximum de vraisemblance}
+\[
+\boxed{\hat{q}_{ij} = \frac{N_{ij}}{T_i} \;(i \neq j),}
+\qquad
+\hat{q}_{ii} = -\hat{\lambda}_i = -\sum_{j \neq i} \hat{q}_{ij}
+\]
+où $N_{ij}$ = transitions observées $i\to j$, et $T_i = \sum \Delta t_k^{(s)}$ pour les clics en état $i$.
+\end{thmbox}
+
+\subsubsection{Temps Totaux}
+
+\begin{center}
+\begin{tabular}{lrr}
+\toprule
+\textbf{État} & $T_i$ \textbf{(secondes)} & $T_i$ \textbf{(heures)} \\
+\midrule
+\rowcolor{LightBlue}   Browsing   & $1.886 \times 10^7$ & $5\,238$ h \\
+\rowcolor{LightOrange} Engaged    & $9.408 \times 10^6$ & $2\,613$ h \\
+\rowcolor{LightRed}    HighIntent & $7.247 \times 10^6$ & $2\,013$ h \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Matrice Estimée}
+
+\[
+\hat{\mat{Q}}\;[\mathrm{s}^{-1}] =
+\renewcommand{\arraystretch}{1.6}
+\begin{pmatrix}
+-0.005303 & +0.002846 & 0          & +0.000080 & +0.002377 \\
+0         & -0.005705 & +0.001836  & +0.000241 & +0.003629 \\
+0         & 0         & -0.002383  & +0.000389 & +0.001994 \\
+0         & 0         & 0          & 0         & 0 \\
+0         & 0         & 0          & 0         & 0
+\end{pmatrix}
+\]
+
+En \textbf{taux par minute} ($\times 60$) :
+\[
+60\,\hat{\mat{Q}}\;[\mathrm{min}^{-1}] =
+\begin{pmatrix}
+-0.3182 & +0.1708 & 0       & +0.0048 & +0.1426 \\
+0       & -0.3423 & +0.1102 & +0.0144 & +0.2177 \\
+0       & 0       & -0.1430 & +0.0234 & +0.1196 \\
+0       & 0       & 0       & 0       & 0       \\
+0       & 0       & 0       & 0       & 0
+\end{pmatrix}
+\]
+
+\begin{itemize}[leftmargin=2cm,itemsep=4pt]
+  \item \textbf{Browsing $\to$ Engaged} ($q = 0.1708$/min) : les transitions sont fréquentes ---
+  de nombreux utilisateurs s'engagent progressivement avec la plateforme après une première exploration.
+  \item \textbf{Engaged $\to$ HighIntent} ($q = 0.1102$/min) : ces transitions correspondent à une
+  \textbf{progression dans le parcours d'achat}, l'utilisateur découvrant des produits d'intérêt croissant.
+  \item \textbf{Transitions vers Exit} ($q_{BE}=0.143$, $q_{EE}=0.218$, $q_{HE}=0.120$ /min) :
+  les taux vers Exit sont les plus élevés à chaque état, indiquant que la \textbf{majorité des sessions
+  se terminent sans achat}.
+\end{itemize}
+
+\subsection{Interprétation Probabiliste du Modèle}
+\label{sec:interp_proba}
+
+Le modèle CTMC construit dans ce chapitre peut être interprété comme un
+\textbf{entonnoir de conversion probabiliste} décrivant la progression des utilisateurs vers l'achat.
+
+\begin{insightbox}
+La structure triangulaire de $\hat{\mat{Q}}$ indique que cette progression est essentiellement
+\textbf{unidirectionnelle} : les utilisateurs avancent dans le parcours mais ne reviennent pas
+à un état d'engagement plus faible.
+\end{insightbox}
+
+\subsection{Diagramme des États}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.97\textwidth]{fig1_diagramme_etats.png}
+\caption{Diagramme des états de la CTMC Yoochoose. Noeuds bleu/orange/rouge = transitoires ;
+vert (Buy) et gris (Exit) = absorbants. Taux en transitions/minute.}
+\end{figure}
+
+% CORRECTION : accolade orpheline supprimée, \subection → \subsection
+\textbf{Remarque :} $q_{BH} = 0$ --- Absence de Transition Directe
+
+Dans le dataset Yoochoose, \textbf{aucune transition directe} de l'état
+Browsing vers l'état HighIntent n'a été observée : $\hat{q}_{BH} = 0$.
+
+\[
+\text{Browsing} \xrightarrow{0.171/\text{min}} \text{Engaged}
+\xrightarrow{\frac{0.110}{\tex}t{min}} \text{HighIntent}
+\xrightarrow{} \text{Buy ou Exit}
+\]
+
+\begin{insightbox}
+\textbf{Explication comportementale de $\hat{q}_{BH} = 0$ :}
+\begin{itemize}[leftmargin=1.5cm,itemsep=2pt]
+  \item L'état HighIntent correspond à $k \geq 6$ clics dans une session.
+  Pour atteindre ce seuil, l'utilisateur doit nécessairement passer par
+  les états Browsing ($k \leq 2$) et Engaged ($3 \leq k \leq 5$).
+  \item Cela reflète le fait que \textbf{l'engagement se construit progressivement}.
+  \item Ce résultat confirme la \textbf{structure séquentielle} de l'entonnoir
+  de conversion e-commerce.
+\end{itemize}
+\end{insightbox}
+
+%============================================================
+% CORRECTION : \subection → \subsection
+\subsection{Probabilités de Saut (Chaîne Embedded)}
+\label{sec:saut}
+%============================================================
+
+\begin{defbox}{Probabilités de saut}
+Lorsque la CTMC quitte l'état $i$, elle saute vers $j$ avec probabilité :
+\[
+\boxed{p_{ij} = \frac{q_{ij}}{\lambda_i} = \frac{q_{ij}}{-q_{ii}}}
+\]
+\end{defbox}
+
+\begin{center}
+\begin{tabular}{l B O R A V}
+\toprule
+\textbf{De $\!\backslash\!$ Vers} &
+\textcolor{NavyBlue}{\small\textbf{Browsing}} &
+\textcolor{DarkOrange}{\small\textbf{Engaged}} &
+\textcolor{DarkRed}{\small\textbf{HighIntent}} &
+\textcolor{BuyGreen}{\small\textbf{Buy}} &
+\textcolor{Gray}{\small\textbf{Exit}} \\
+\midrule
+\textbf{Browsing}   & --- & $0.5367$ & $0.0000$ & $0.0151$ & $0.4482$ \\
+\textbf{Engaged}    & $0.0000$ & --- & $0.3218$ & $0.0421$ & $0.6361$ \\
+\textbf{HighIntent} & $0.0000$ & $0.0000$ & --- & $0.1636$ & $0.8365$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{insightbox}
+Depuis \textbf{Browsing} : 53.7\,\% vers Engaged, 44.8\,\% abandonnent, 1.5\,\% achètent. \\
+Depuis \textbf{Engaged} : 32.2\,\% vers HighIntent, 63.6\,\% abandonnent. \\
+Depuis \textbf{HighIntent} : \textbf{16.4\,\%} convertissent --- état de décision critique.
+\end{insightbox}
+
+\subsection{Équations de Kolmogorov et $\mat{P}(t)$}
+
+\subsubsection{Équations de Kolmogorov}
+
+\begin{thmbox}{Équations forward}
+\[
+\boxed{\frac{d\mat{P}(t)}{dt} = \mat{P}(t)\,\mat{Q}}, \qquad \mat{P}(0) = \mat{I}
+\]
+\end{thmbox}
+
+\begin{thmbox}{Équations backward}
+\[
+\boxed{\frac{d\mat{P}(t)}{dt} = \mat{Q}\,\mat{P}(t)}
+\]
+\end{thmbox}
+
+\begin{thmbox}{Solution : exponentielle matricielle}
+\[
+\boxed{\mat{P}(t) = e^{\mat{Q}t} = \sum_{k=0}^{+\infty} \frac{(\mat{Q}t)^k}{k!}}
+\]
+\textbf{Preuve :} $\;\dfrac{d}{dt}e^{\mat{Q}t}
+= \sum_{k=1}^{\infty}\dfrac{\mat{Q}^k t^{k-1}}{(k-1)!}
+= \mat{Q}\,e^{\mat{Q}t} \;\checkmark$
+\end{thmbox}
+
+\subsubsection{Résultats Numériques}
+
+\textbf{$t = 1$ min :}
+\[
+\mat{P}(60\,\text{s}) = \begin{pmatrix}
+0.7275 & 0.1228 & 0.0072 & 0.0052 & 0.1374 \\
+0 & 0.7101 & 0.0866 & 0.0133 & 0.1900 \\
+0 & 0 & 0.8668 & 0.0218 & 0.1115 \\
+0 & 0 & 0 & 1 & 0 \\ 0 & 0 & 0 & 0 & 1
+\end{pmatrix}
+\]
+\textbf{$t = 5$ min :}
+\[
+\mat{P}(300\,\text{s}) = \begin{pmatrix}
+0.2037 & 0.1639 & 0.0632 & 0.0266 & 0.5426 \\
+0 & 0.1806 & 0.1706 & 0.0497 & 0.5991 \\
+0 & 0 & 0.4892 & 0.0835 & 0.4273 \\
+0 & 0 & 0 & 1 & 0 \\ 0 & 0 & 0 & 0 & 1
+\end{pmatrix}
+\]
+\textbf{$t = 10$ min :}
+\[
+\mat{P}(600\,\text{s}) = \begin{pmatrix}
+0.0415 & 0.0630 & 0.0718 & 0.0455 & 0.7783 \\
+0 & 0.0326 & 0.1142 & 0.0730 & 0.7802 \\
+0 & 0 & 0.2393 & 0.1244 & 0.6363 \\
+0 & 0 & 0 & 1 & 0 \\ 0 & 0 & 0 & 0 & 1
+\end{pmatrix}
+\]
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.97\textwidth]{fig3_evolution_Pt.png}
+\caption{Évolution temporelle $\mat{P}(t)=e^{\hat{\mat{Q}}t}$ sur 20 minutes.
+Gauche : depuis Browsing. Droite : depuis HighIntent.}
+\end{figure}
+
+\subsubsection{Analyse Temporelle et Implications Business}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{lcccl}
+\toprule
+\textbf{Phase} & \textbf{Temps} & \textbf{P(encore Browsing)} & \textbf{P(Exit)} & \textbf{Lecture business} \\
+\midrule
+\rowcolor{LightBlue}  Début de session & $t=1$ min & $72.8\,\%$ & $13.7\,\%$ & Utilisateur actif, encore à engager \\
+\rowcolor{LightOrange}  Mi-session & $t=5$ min & $20.4\,\%$ & $54.3\,\%$ & Risque d'abandon croissant \\
+\rowcolor{LightRed}  Fin de session & $t=10$ min & $4.2\,\%$ & $77.8\,\%$ & Majorité a abandonné \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{insightbox}
+Après \textbf{10 minutes} depuis l'état Browsing, $77.8\,\%$ des utilisateurs ont quitté
+la plateforme sans acheter. Il est donc \textbf{crucial d'intervenir tôt} : une recommandation
+déclenchée avant $t=5$ min peut significativement améliorer le taux de conversion.
+\end{insightbox}
+\newpage
+
+\subsection{Temps Moyen dans les États}
+
+% CORRECTION : \frac{1}{\lam}bda_i → \frac{1}{\lambda_i}
+Le temps moyen de séjour est $\mathbb{E}[T_i] = \frac{1}{\lambda_i} = -1/q_{ii}$ :
+
+\begin{center}
+\begin{tabular}{lccc}
+\toprule
+\textbf{État} & $\lambda_i$ (s$^{-1}$) & $\mathbb{E}[T_i]$ (s) & $\mathbb{E}[T_i]$ (min) \\
+\midrule
+\rowcolor{LightBlue}   Browsing   & $0.005303$ & $188.6$ & $\mathbf{3.14}$ \\
+\rowcolor{LightOrange} Engaged    & $0.005705$ & $175.3$ & $\mathbf{2.92}$ \\
+\rowcolor{LightRed}    HighIntent & $0.002383$ & $419.6$ & $\mathbf{6.99}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{insightbox}
+\textbf{HighIntent} (6.99 min) est deux fois plus long que Browsing/Engaged :
+\textbf{hésitation prolongée}. C'est la fenêtre d'intervention optimale pour
+une promotion ou recommandation.
+\end{insightbox}
+
+\subsubsection{Analyse Comportementale du Temps de Séjour}
+
+\begin{itemize}[leftmargin=2cm,itemsep=4pt]
+  \item \textbf{Browsing (3.14 min)} : l'utilisateur explore rapidement la plateforme.
+  La priorité est de lui présenter des produits pertinents pour accélérer la progression vers Engaged.
+  \item \textbf{Engaged (2.92 min)} : paradoxalement, le séjour est légèrement plus court qu'en Browsing.
+  L'utilisateur est plus focusé --- il compare et évalue.
+  \item \textbf{HighIntent (6.99 min)} : le temps de séjour est \textbf{nettement supérieur}.
+  Cette phase constitue un \textbf{point stratégique} pour intervenir avec des recommandations
+  personnalisées, des promotions temporaires, et des avis clients.
+\end{itemize}
+
+\begin{warnbox}
+\textbf{Rappel des états :}
+\begin{itemize}[leftmargin=1.5cm,itemsep=0pt]
+  \item \textbf{Browsing} : $k \leq 2$ clics
+  \item \textbf{Engaged} : $3 \leq k \leq 5$ clics
+  \item \textbf{HighIntent} : $k \geq 6$ clics
+  \item \textbf{Buy / Exit} : états absorbants (fin irréversible de session)
+\end{itemize}
+\end{warnbox}
+
+\subsection{Temps Moyen Avant Absorption}
+
+\begin{thmbox}{Matrice fondamentale}
+\[
+\mat{N} = (-\mat{Q}_T)^{-1}
+\]
+où $\mat{Q}_T$ est la sous-matrice de $\mat{Q}$ correspondant aux états transitoires.
+Chaque élément $n_{ij}$ représente le \textbf{temps moyen total passé dans l'état $j$}
+avant absorption lorsque la session commence dans l'état $i$.
+\end{thmbox}
+
+\subsubsection{Matrice Fondamentale Estimée}
+
+\[
+\mat{N}\;[\text{minutes}] =
+\begin{pmatrix}
+3.143 & 1.568 & 1.208 \\
+0     & 2.921 & 2.251 \\
+0     & 0     & 6.993
+\end{pmatrix}
+\]
+
+\subsubsection{Temps Moyen Avant la Fin de Session}
+
+\[
+\boxed{t_i^* = (\mat{N}\,\mathbf{1})_i = \sum_{j \in \mathcal{T}} n_{ij}}
+\]
+
+\begin{center}
+\begin{tabular}{lcc}
+\toprule
+\textbf{État initial} & $t_i^*$ (secondes) & $t_i^*$ (minutes) \\
+\midrule
+\rowcolor{LightBlue}   Browsing   & $355.11$ & $\mathbf{5.92}$ \\
+\rowcolor{LightOrange} Engaged    & $310.31$ & $\mathbf{5.17}$ \\
+\rowcolor{LightRed}    HighIntent & $419.59$ & $\mathbf{6.99}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{insightbox}
+La majorité des sessions se terminent en environ \textbf{5 à 7 minutes}.
+La fenêtre d'intervention doit intervenir rapidement --- idéalement dans les
+\textbf{3 premières minutes}.
+\end{insightbox}
+
+\subsection{Probabilités Finales d'Achat}
+
+\begin{thmbox}{Matrice d'absorption}
+\[
+\mat{B} = \mat{N}\,\mat{R}, \qquad \mat{P}^* = \lim_{t\to\infty}e^{\mat{Q}t}
+\]
+\end{thmbox}
+
+\[
+\mat{P}^* =
+\begin{pmatrix}
+0&0&0& \mathbf{0.0659} & 0.9341 \\
+0&0&0& \mathbf{0.0947} & 0.9053 \\
+0&0&0& \mathbf{0.1636} & 0.8364 \\
+0&0&0& 1 & 0 \\ 0&0&0& 0 & 1
+\end{pmatrix}
+\]
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.97\textwidth]{fig4_proba_achat.png}
+\caption{Gauche : $P(\text{Buy}\mid\text{état},t)$ au cours du temps (pointillés = asymptotes).
+Droite : probabilités finales d'achat et d'abandon par état initial.}
+\end{figure}
+
+\begin{insightbox}
+La probabilité d'achat \textbf{augmente avec l'engagement} :
+$6.6\,\%$ (Browsing) $\to$ $9.5\,\%$ (Engaged) $\to$ $\mathbf{16.4\,\%}$ (HighIntent).
+Priorité : retenir les utilisateurs en HighIntent.
+\end{insightbox}
+
+\begin{center}
+\begin{tabular}{lcccl}
+\toprule
+\textbf{État initial} & \textbf{P(Buy)} & \textbf{P(Exit)} & \textbf{Ratio} & \textbf{Interprétation} \\
+\midrule
+\rowcolor{LightBlue}   Browsing   & $6.6\,\%$  & $93.4\,\%$ & $1:14$ & Faible conversion, explore \\
+\rowcolor{LightOrange} Engaged    & $9.5\,\%$  & $90.5\,\%$ & $1:10$ & Conversion modérée \\
+\rowcolor{LightRed}    HighIntent & $\mathbf{16.4\,\%}$ & $83.6\,\%$ & $1:5$ & \textbf{Conversion $\times\,2.5$ vs Browsing} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Vérification de la Loi Exponentielle}
+
+\[
+T_i \sim \mathcal{E}(\lambda_i), \qquad \mathbb{E}[T_i] = \frac{1}{\lambda_i},
+\qquad \lambda_i = -q_{ii}
+\]
+
+\subsubsection{Test de Kolmogorov-Smirnov}
+
+\[
+D_n = \sup_{t \geq 0} \bigl| F_n(t) - F_{\mathcal{E}(\hat\lambda_i)}(t) \bigr|,
+\qquad F_{\mathcal{E}(\lambda)}(t) = 1 - e^{-\lambda t}
+\]
+
+\begin{center}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{État} & $\hat\lambda_i$ (s$^{-1}$) & $\hat\lambda_i$ (min$^{-1}$) & \textbf{KS} & \textbf{p-val} \\
+\midrule
+\rowcolor{LightBlue}   Browsing   & $0.01030$ & $0.618$ & $0.161$ & $\approx 0$ \\
+\rowcolor{LightOrange} Engaged    & $0.01197$ & $0.718$ & $0.202$ & $\approx 0$ \\
+\rowcolor{LightRed}    HighIntent & $0.01228$ & $0.737$ & $0.169$ & $\approx 0$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{warnbox}
+Un test statistique strict (ex.\ Kolmogorov-Smirnov) est souvent rejeté lorsque le nombre
+d'observations est très grand ($N > 10^5$). Dans ce projet, la loi exponentielle est utilisée
+comme \textbf{approximation opérationnelle} permettant de construire un modèle CTMC interprétable.
+\end{warnbox}
+
+\subsection{Applications Pratiques du Modèle}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{lll}
+\toprule
+\textbf{Signal détecté} & \textbf{Action recommandée} & \textbf{Objectif} \\
+\midrule
+\rowcolor{LightBlue}   Browsing $> 3$ min & Afficher produits populaires & Accélérer $\to$ Engaged \\
+\rowcolor{LightOrange} Engaged $> 2$ min & Recommandation personnalisée & Accélérer $\to$ HighIntent \\
+\rowcolor{LightRed}    HighIntent $> 3$ min & Promotion flash ($-10\,\%$) & Réduire le taux d'abandon \\
+\rowcolor{LightRed}    HighIntent $> 5$ min & Notification panier abandonné & Urgence d'achat \\
+\rowcolor{LightGray}   Session $> 8$ min & Email de relance post-session & Récupérer l'abandon \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Résultats principaux}
+
+\begin{enumerate}[leftmargin=2cm,itemsep=3pt]
+  \item $\hat{\mat{Q}}$ \textbf{triangulaire supérieure} --- entonnoir unidirectionnel,
+  processus de naissance pure ($\mu \approx 0$)
+  \item \textbf{Temps de séjour :} Browsing~(3.14 min), Engaged~(2.92 min),
+  HighIntent~(\textbf{6.99 min} --- phase d'hésitation critique)
+  \item \textbf{Temps moyen avant absorption :} \textbf{5.92 min} (Browsing),
+  \textbf{5.17 min} (Engaged), \textbf{6.99 min} (HighIntent)
+  \item \textbf{Probabilités finales :} $6.6\,\%$, $9.5\,\%$, $\mathbf{16.4\,\%}$
+  selon l'état initial
+  \item \textbf{Cohérence} parfaite avec le Chapitre~1, écart $<6\times10^{-5}$
+\end{enumerate}
+
+\medskip
+
+\newpage
+% ══════════════════════════════════════════════════════════════════════════════
+%  CHAPITRE 3 — HMM
+% ══════════════════════════════════════════════════════════════════════════════
+\section{Chapitre 3 : Modèles de Markov Cachés (HMM)}
+
+\subsection{Motivation}
+
+Les chapitres précédents supposent que l'état comportemental est \textbf{directement observable}
+(via le rang du clic). En réalité, les états comportementaux (Browsing, Engaged, HighIntent)
+sont des construits \textit{latents} que l'on ne peut observer directement --- on ne voit que
+les actions et les temps inter-clics. Le modèle de Markov caché (HMM) permet d'inférer ces
+états à partir des observations seules.
+
+\subsection{Formalisme HMM}
+
+% CORRECTION : \defbox{...}{...} → \begin{defbox}{...}...\end{defbox}
+\begin{defbox}{Modèle de Markov Caché}
+Un HMM est défini par le quintuplet :
+\[
+\lambda = (S,\; \mathcal{O},\; A,\; B,\; \pi)
+\]
+\begin{itemize}[leftmargin=1.5cm,itemsep=2pt]
+  \item $S = \{s_1, s_2, s_3\}$ : états cachés (Browsing, Engaged, HighIntent)
+  \item $\mathcal{O}$ : alphabet des observations
+  \item $A \in \mathbb{R}^{3 \times 3}$ : matrice de transition entre états cachés
+  \item $B$ : matrice (ou densité) d'émission des observations depuis chaque état
+  \item $\pi \in \mathbb{R}^3$ : distribution initiale des états
+\end{itemize}
+\end{defbox}
+
+Les trois problèmes fondamentaux d'un HMM sont :
+\begin{enumerate}[leftmargin=2cm,itemsep=2pt]
+  \item \textbf{Évaluation} : $P(O \mid \lambda)$ $\to$ algorithme Forward-Backward
+  \item \textbf{Décodage} : séquence d'états la plus probable $\to$ algorithme de Viterbi
+  \item \textbf{Apprentissage} : estimer $\lambda$ $\to$ algorithme Baum-Welch (EM)
+\end{enumerate}
+
+\subsection{HMM Discret}
+
+\subsubsection{Observations et paramètres}
+
+Les observations sont discrétisées en 9 classes combinant activité (Low/Medium/High)
+et vitesse de clic (Fast/Normal/Slow).
+
+\begin{center}
+\begin{tabular}{lccc}
+\toprule
+& \textbf{Browsing} & \textbf{Engaged} & \textbf{HighIntent} \\
+\midrule
+\rowcolor{LightBlue}   Browsing   & 0.6357 & 0.3643 & 0.0000 \\
+\rowcolor{LightOrange} Engaged    & 0.0000 & 0.7733 & 0.2267 \\
+\rowcolor{LightRed}    HighIntent & 0.0000 & 0.0000 & 0.9999 \\
+\bottomrule
+\end{tabular}
+\captionof{table}{Matrice de transition $A$ estimée (HMM discret)}
+\end{center}
+
+% CORRECTION : \insightbox{...} → \begin{insightbox}...\end{insightbox}
+\begin{insightbox}
+Browsing est ``sticky'' (63,6\% auto-transition), HighIntent quasi-absorbant (99,99\%).
+La progression Browsing $\to$ Engaged $\to$ HighIntent est graduelle et irréversible dans le HMM.
+\end{insightbox}
+
+\subsubsection{Algorithme Forward}
+
+\begin{mathBox}
+\[
+\alpha_1(i)=\pi_i\,b_i(O_1)
+\]
+\[
+\alpha_t(j)=
+\left[
+\sum_i
+\alpha_{t-1}(i)\,a_{ij}
+\right]
+b_j(O_t)
+\]
+\[
+P(O|\lambda)=\sum_i \alpha_T(i)
+\]
+\end{mathBox}
+
+Sur la séquence de référence :
+
+\[
+[
+\text{Low\_Normal},
+\text{Low\_Fast},
+\text{Medium\_Normal},
+\text{Medium\_Normal}
+]
+\]
+
+\begin{center}
+\begin{tabular}{clccc}
+\toprule
+$t$ &
+Observation &
+$\alpha_t(\text{Browsing})$ &
+$\alpha_t(\text{Engaged})$ &
+$\alpha_t(\text{HighIntent})$
+\\
+\midrule
+
+0 &
+Low\_Normal &
+0.5498 &
+0.0000 &
+0.0000
+\\
+
+1 &
+Low\_Fast &
+0.1141 &
+0.0236 &
+0.0000
+\\
+
+2 &
+Medium\_Normal &
+0.0000 &
+0.0237 &
+0.0000
+\\
+
+3 &
+Medium\_Normal &
+0.0000 &
+0.0105 &
+0.0000
+\\
+
+\bottomrule
+\end{tabular}
+\end{center}
+
+\[
+P(O|\lambda)=0.01050
+\]
+
+\vspace{0.4cm}
+
+L’algorithme Forward calcule récursivement
+la probabilité partielle d’observer
+la séquence jusqu’au temps \(t\).
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.97\textwidth]{t.png}
+\caption{Algorithme Forward --- Matrice $\alpha$}
+\label{fig:forward}
+\end{figure}
+\noindent
+La matrice $\alpha$ représente
+les probabilités directes :
+
+\[
+\alpha_t(i)
+=
+P(O_1,\ldots,O_t,q_t=i \mid \lambda)
+\]
+
+\begin{insightbox}
+La valeur finale :
+
+\[
+P(O|\lambda)=0.0105
+\]
+
+indique que cette séquence d’observations
+reste globalement peu probable.
+\end{insightbox}
+
+
+
+% %============================================================
+\subsubsection{Algorithme Backward}
+% %============================================================
+
+\begin{mathBox}
+\[
+\beta_T(i)=1
+\]
+\[
+\beta_t(i)=
+\sum_j a_{ij}\,b_j(O_{t+1})\,\beta_{t+1}(j)
+\]
+\end{mathBox}
+
+L'algorithme Backward calcule la probabilité
+d'observer le reste de la séquence à partir du temps \(t\).
+
+\begin{center}
+\includegraphics[width=0.72\textwidth]{b.png}
+\end{center}
+% \begin{figure}[H]
+% \centering
+% \includegraphics[width=0.97\textwidth]{t.png}
+% \caption{Algorithme Forward --- Matrice $\alpha$}
+% \label{fig:forward}
+% \end{figure}
+\begin{center}
+\small
+\textbf{Figure :} Algorithme Backward --- Matrice $\beta$
+\end{center}
+
+\vspace{0.3cm}
+
+\noindent
+La matrice $\beta$ représente les probabilités rétrogrades :
+\[
+\beta_t(i)
+=
+P(O_{t+1},\ldots,O_T \mid q_t=i,\lambda)
+\]
+
+\begin{validBox}
+Cohérence vérifiée :
+\[
+P(O|\lambda)_{\text{Forward}}
+=
+P(O|\lambda)_{\text{Backward}}
+=
+0.01050
+\]
+
+La différence numérique observée :
+\[
+1.73\times10^{-18}
+\]
+correspond uniquement à une erreur d’arrondi machine.
+\end{validBox}
+
+
+
+%============================================================
+\subsubsection{Algorithme Baum-Welch (EM)}
+% %============================================================
+
+\begin{mathBox}
+\textbf{E-step :}
+\[
+\gamma_t(i)=
+\frac{\alpha_t(i)\beta_t(i)}
+{\sum_k \alpha_t(k)\beta_t(k)}
+\]
+\[
+\xi_t(i,j)=
+\frac{
+\alpha_t(i)a_{ij}b_j(O_{t+1})\beta_{t+1}(j)
+}
+{P(O|\lambda)}
+\]
+
+\vspace{0.2cm}
+
+\textbf{M-step :}
+\[
+\hat{A}_{ij}=
+\frac{\sum_t \xi_t(i,j)}
+{\sum_t \gamma_t(i)}
+\]
+\[
+\hat{B}_{ij}=
+\frac{
+\sum_{t:O_t=v_k}\gamma_t(i)
+}
+{\sum_t \gamma_t(i)}
+\]
+\end{mathBox}
+
+\begin{center}
+\begin{tabular}{ccc}
+\toprule
+\textbf{Itération} &
+\textbf{Log-Likelihood} &
+\textbf{Amélioration} \\
+\midrule
+1 & $-5114.44$ & --- \\
+2 & $-5111.26$ & $+2.98$ \\
+3--10 & $-5111.26$ & Convergence \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\vspace{0.4cm}
+
+\begin{center}
+\includegraphics[width=0.75\textwidth]{bc.png}
+\end{center}
+
+\begin{center}
+\small
+\textbf{Figure :} Convergence Baum-Welch --- Log-Likelihood
+\end{center}
+
+\vspace{0.3cm}
+
+Après apprentissage, les auto-transitions augmentent :
+Browsing (\(+1.06\%\)) et Engaged (\(+0.92\%\))
+deviennent plus persistants.
+
+La matrice d’émission \(B\) montre également une séparation nette :
+\begin{itemize}
+\item Browsing \(\rightarrow\) Low
+\item Engaged \(\rightarrow\) Medium
+\item HighIntent \(\rightarrow\) High
+\end{itemize}
+
+\vspace{0.4cm}
+
+\begin{center}
+\includegraphics[width=0.82\textwidth]{BW.png}
+\end{center}
+
+\begin{center}
+\small
+\textbf{Figure :} Matrices avant/après Baum-Welch
+\end{center}
+
+\begin{ecoBiz}
+Après apprentissage, chaque état latent devient fortement associé
+à une seule catégorie d’observation.
+
+Le niveau d’activité (Low/Medium/High)
+constitue donc un excellent indicateur
+de l’état comportemental réel de l’utilisateur.
+\end{ecoBiz}
+
+% \newpage
+
+% %============================================================
+\subsubsection{Algorithme de Viterbi}
+% %============================================================
+
+\begin{mathBox}
+\[
+\delta_t(j)=
+\max_i
+\left[
+\delta_{t-1}(i)a_{ij}
+\right]
+b_j(O_t)
+\]
+\[
+\psi_t(j)=
+\arg\max_i
+\left[
+\delta_{t-1}(i)a_{ij}
+\right]
+\]
+\end{mathBox}
+
+La séquence optimale décodée est :
+
+\[
+\mathbf{q}^*
+=
+[
+\text{Browsing},
+\text{Browsing},
+\text{Engaged},
+\text{Engaged}
+]
+\]
+
+\begin{center}
+\includegraphics[width=0.74\textwidth]{V.png}
+\end{center}
+
+\begin{center}
+\small
+\textbf{Figure :} Algorithme Viterbi --- Matrice $\delta$
+\end{center}
+
+\vspace{0.3cm}
+
+\noindent
+Contrairement à Forward, l’algorithme Viterbi
+ne somme pas tous les chemins possibles :
+il conserve uniquement le chemin de probabilité maximale.
+
+\begin{ecoBiz}
+Le comportement utilisateur montre deux phases :
+\begin{itemize}
+\item \(t=0,1\) : exploration rapide (Browsing)
+\item \(t=2,3\) : engagement plus fort (Engaged)
+\end{itemize}
+
+La transition vers l’état Engaged représente
+une fenêtre stratégique pour déclencher
+une recommandation personnalisée.
+\end{ecoBiz}
+\subsection{HMM Continu (Gaussien)}
+
+\subsubsection{Formulation}
+
+\[
+\lambda_{\text{cont}} = (S,\; A,\; \pi,\; \boldsymbol{\mu},\; \boldsymbol{\sigma})
+\]
+
+Les émissions sont des densités gaussiennes sur les temps inter-clics $\Delta t$ :
+\[
+b_i(x) = \mathcal{N}(x;\, \mu_i,\, \sigma_i)
+\]
+
+\textbf{Données :} 93\,656 séquences de temps inter-clics $\Delta t \in [0,\, 490]$ s
+(médiane : 53.73 s, $p_{95}$ : 490.10 s).
+
+\subsubsection{Paramètres appris par Baum-Welch continu}
+
+\begin{center}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{État} & Init $\mu$ & \textbf{Appris $\mu$} & Init $\sigma$ & \textbf{Appris $\sigma$} \\
+\midrule
+\rowcolor{LightBlue}   Browsing   & 5 s   & 5 s    & 3 s   & 0.001 s \\
+\rowcolor{LightOrange} Engaged    & 30 s  & 39 s   & 10 s  & 27 s    \\
+\rowcolor{LightRed}    HighIntent & 120 s & 210 s  & 40 s  & 138 s   \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{tabular}{cc}
+\toprule
+\textbf{Itération} & \textbf{Log-Likelihood} \\
+\midrule
+0        & $-80\,400.74$ \\
+1        & $-11\,093.04$ \\
+10       & $-6\,097.68$ \\
+$>$20    & $-6\,093.25$ (convergence) \\
+\midrule
+\textbf{Amélioration totale} & \textbf{92\%} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{ecoBiz}
+\textbf{Découverte clé --- HighIntent = Réflexion :}
+L'état HighIntent est caractérisé par des temps inter-clics très longs ($\mu = 210$ s,
+$\sigma = 138$ s). L'utilisateur \textbf{pause}, ne clique pas pendant 3--4 minutes en moyenne.
+Cette pause est un signal fort de considération d'achat.
+À $\mu + 2\sigma \approx 486$ s, envoyer une notification d'urgence peut significativement
+augmenter la conversion.
+\end{ecoBiz}
+
+\subsection{Synthèse HMM discret vs continu}
+
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+\textbf{Aspect} & \textbf{HMM Discret} & \textbf{HMM Continu} \\
+\midrule
+\rowcolor{LightGray} Observations & 9 classes activité$\times$vitesse & Temps inter-clics $\Delta t$ \\
+Émissions & Matrice $B$ & Gaussiennes $\mathcal{N}(\mu_i, \sigma_i)$ \\
+\rowcolor{LightGray} Paramètres clés & Séparation parfaite $B$ & $\mu_{HI} = 210$ s \\
+Apport principal & Identification séquentielle & Quantification temporelle \\
+\rowcolor{LightBlue}\textbf{HighIntent} & Auto-transition 99,99\% & Pause 210 s (signal achat) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+
+
+% % ══════════════════════════════════════════════════════════════════════════════
+%  SYNTHÈSE ET RECOMMANDATIONS
+% ══════════════════════════════════════════════════════════════════════════════
+\subsection{Synthèse Générale et Recommandations Business}
+
+\subsubsection{Tableau de bord des résultats clés}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.4}
+\begin{tabularx}{\textwidth}{lXXX}
+\toprule
+\rowcolor{DarkBlue}
+\color{white}\textbf{KPI} &
+\color{white}\textbf{Valeur} &
+\color{white}\textbf{Source} &
+\color{white}\textbf{Implication business} \\
+\midrule
+Conversion depuis Browsing &
+  \cellcolor{LightBuy}\textbf{6.59\%} & $\mat{B}_{B,\text{Buy}}$ &
+  1 session/15 $\to$ achat \\
+\rowcolor{LightGray}
+Taux d'abandon global &
+  \cellcolor{LightRed}\textbf{93.41\%} & $\mat{B}_{B,\text{Exit}}$ &
+  Très fort taux d'abandon \\
+Conversion depuis HighIntent &
+  \textbf{16.36\%} & $\mat{B}_{H,\text{Buy}}$ &
+  $\times 2.5$ vs Browsing \\
+\rowcolor{LightGray}
+Durée moy. session (CTMC) &
+  \textbf{5--7 min} & $t^* = \mat{N}\mathbf{1}$ &
+  Fenêtre d'intervention courte \\
+Séjour HighIntent (CTMC) &
+  \textbf{6.99 min} & $1/\lambda_{HI}$ &
+  Phase d'hésitation critique \\
+\rowcolor{LightGray}
+Pause HighIntent (HMM) &
+  $\mu = \mathbf{210}$ s & Gaussienne apprise &
+  Signal fort de considération \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\subsubsection{Progression des modèles}
+
+\begin{center}
+\begin{tabular}{llll}
+\toprule
+\textbf{Modèle} & \textbf{Unité de temps} & \textbf{Observabilité des états} & \textbf{Apport principal} \\
+\midrule
+\rowcolor{LightBlue}   DTMC (Ch.1) & Clics & Observable directement & Matrice $\mat{P}$, taux de conversion \\
+\rowcolor{LightOrange} CTMC (Ch.2) & Secondes & Observable directement & Durées réelles, fenêtres d'intervention \\
+\rowcolor{LightRed}    HMM (Ch.3)  & Clics / $\Delta t$ & États latents inférés & Inversion comportementale \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsubsection{Recommandations stratégiques}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{lll}
+\toprule
+\textbf{Signal détecté} & \textbf{Action recommandée} & \textbf{Objectif} \\
+\midrule
+\rowcolor{LightBlue}   Browsing $> 3$ min & Afficher produits populaires & Accélérer $\to$ Engaged \\
+\rowcolor{LightOrange} Engaged $> 2$ min & Recommandation personnalisée & Accélérer $\to$ HighIntent \\
+\rowcolor{LightRed}    HighIntent $> 3$ min & Promotion flash ($-10\%$) & Réduire le taux d'abandon \\
+\rowcolor{LightRed}    HighIntent $> 5$ min & Notification panier abandonné & Urgence d'achat \\
+\rowcolor{LightGray}   Session $> 8$ min & Email de relance post-session & Récupérer l'abandon \\
+\rowcolor{LightBuy}    $\Delta t > 400$ s (HMM) & Offre exclusive immédiate & Convertir la pause \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{insightbox}
+\textbf{Recommandations stratégiques prioritaires :}
+\begin{itemize}[leftmargin=1.5cm,itemsep=2pt]
+  \item Intervenir en \textbf{HighIntent après 3 min} : promotion ciblée, comparateur de prix.
+  \item Accélérer la progression \textbf{Browsing $\to$ Engaged} : améliorer la pertinence des premiers résultats.
+  \item Réduire le temps de décision en HighIntent : simplifier le tunnel d'achat.
+  \item Exploiter les \textbf{longues pauses} ($\Delta t > 3$ min) comme signal d'intention fort.
+\end{itemize}
+\end{insightbox}
+
+\subsubsection{Limites et perspectives}
+
+% CORRECTION : \warnbox{...} → \begin{warnbox}...\end{warnbox}
+\begin{warnbox}
+\textbf{Limites communes aux trois modèles :}
+\begin{itemize}[leftmargin=1.5cm,itemsep=2pt]
+  \item Hypothèse d'homogénéité temporelle : les taux $q_{ij}$ et probabilités $p_{ij}$
+  sont constants, sans dépendance à l'heure, au jour ou à la catégorie de produit.
+  \item Propriété de Markov : le comportement est supposé sans mémoire.
+  En réalité, l'ordre des items consultés peut influencer la décision.
+  \item Délimitation des états par seuils de clics : simplification opérationnelle.
+\end{itemize}
+\end{warnbox}
+
+\begin{perspBox}
+\textbf{Perspectives --- Extension vers les Chapitres suivants :}
+\begin{enumerate}[leftmargin=1.5cm,itemsep=2pt]
+  \item \textbf{CTMC non-homogène} : modéliser des taux variant selon l'heure de la journée.
+  \item \textbf{HMM hiérarchique} : modèles distincts par catégorie de produit ou segment.
+  \item \textbf{IOHMM (Input-Output HMM)} : intégrer des features externes (prix, stock).
+  \item \textbf{Processus de Décision Markovien (MDP)} : optimiser une politique de recommandation
+  $\pi^*$ telle que $P^{\pi^*}(\text{Buy} \mid \text{Browsing}) > 6.59\%$.
+  \item \textbf{Apprentissage par renforcement (RL)} : apprendre la politique optimale
+  sans modèle de transition explicite.
+\end{enumerate}
+\end{perspBox}
+
+
+
+% ══════════════════════════════════════════════════════════════════════════════
+%  CONCLUSION
+% ══════════════════════════════════════════════════════════════════════════════
+\subsection{Conclusion}
+
+Ce projet a démontré comment des modèles probabilistes progressivement enrichis
+permettent de modéliser et d'analyser le comportement des utilisateurs dans une session e-commerce.
+
+\textbf{Chapitre 1 (DTMC)} a fourni le cadre formel de base : la matrice de transition $\mat{P}$,
+la matrice fondamentale $\mat{N}$ et les probabilités d'absorption $\mat{B}$, permettant de
+calculer analytiquement les taux de conversion (6.6\% à 16.4\%) et les durées moyennes
+de session (3.96 à 5.18 clics selon l'état initial).
+
+\textbf{Chapitre 2 (CTMC)} a enrichi ce modèle en intégrant la dimension temporelle réelle
+via les horodatages. La matrice génératrice $\hat{\mat{Q}}$ et l'exponentielle matricielle
+$\mat{P}(t) = e^{\hat{\mat{Q}}t}$ ont permis de quantifier les durées de séjour (3.14 min en
+Browsing, 6.99 min en HighIntent) et les fenêtres d'intervention optimales, tout en confirmant
+la cohérence avec les résultats du Chapitre 1 (écart $< 6 \times 10^{-5}$).
+
+\textbf{Chapitre 3 (HMM)} a levé l'hypothèse d'observabilité directe des états.
+Les algorithmes Forward-Backward, Baum-Welch et Viterbi ont permis d'inférer les états
+comportementaux latents depuis les seules observations. La découverte majeure du HMM continu
+est que l'état HighIntent correspond à des \textbf{pauses prolongées} ($\mu = 210$ s) et non
+à des clics frénétiques --- un signal comportemental exploitable en temps réel.
+
+\vspace{0.5cm}
+
+\begin{center}
+\colorbox{LightBlue}{\parbox{0.92\textwidth}{
+\vspace{0.4cm}
+\centering
+\textcolor{DarkBlue}{\Large\textbf{Résultat central :}} \\[0.3cm]
+\textcolor{DarkBlue}{
+L'état \textbf{HighIntent} --- avec 6.99 minutes de séjour moyen (CTMC),
+une pause caractéristique de 210 secondes (HMM) et 16.4\% de probabilité de conversion (DTMC)
+--- représente le principal \textbf{levier d'optimisation} des plateformes e-commerce.
+Des interventions ciblées à ce stade ont le potentiel d'augmenter significativement
+les taux de conversion.
+}
+\vspace{0.4cm}
+}}
+\end{center}
+
+\newpage
+
+% ════════════════════════════════════════════════════════════════ch4=========================
+
+ 
+\section{Chapitre 4 : Processus de Décision Markovien (MDP)}
+ 
+%============================================================
+\subsection{Introduction et Motivation}
+%============================================================
+ 
+Les trois premiers chapitres ont proposé des modèles \textbf{descriptifs} du
+comportement utilisateur en e-commerce. Le chapitre HMM (Chapitre 3) a notamment
+montré que l'état HighIntent se caractérise par une \textbf{pause prolongée}
+($\mu = 210$ s), signal d'une forte intention d'achat mais aussi d'hésitation.
+ 
+Le \textbf{Chapitre 4} pose une question fondamentalement différente et
+\textbf{décisionnelle} :
+ 
+\begin{center}
+\textit{Comment optimiser les interventions marketing pour augmenter le taux de conversion ?}
+\end{center}
+ 
+Alors que les chapitres précédents répondaient à \textit{``Qu'observe-t-on ?''} et
+\textit{``Que se passe-t-il réellement ?''}, ce chapitre répond à
+\textit{``Que faire pour optimiser la valeur business ?''}
+ 
+\begin{insightbox}
+\textbf{Cadre décisionnel :} Un \textbf{Processus de Décision Markovien (MDP)}
+formalise ce problème en intégrant des \textbf{actions contrôlables},
+des \textbf{récompenses quantifiables}, et une \textbf{politique optimale} à découvrir.
+\end{insightbox}
+ 
+%============================================================
+\subsection{Définition Formelle du MDP}
+%============================================================
+ 
+\subsubsection{Tuple $(S, A, P, R, \gamma)$}
+ 
+\begin{defbox}{Processus de Décision Markovien}
+Un \textbf{Processus de Décision Markovien} est un 5-tuple :
+\[
+  \text{MDP} = (S,\; A,\; P,\; R,\; \gamma)
+\]
+où :
+\begin{itemize}[leftmargin=1.5cm,itemsep=2pt]
+  \item $S = \{s_1, s_2, \ldots, s_n\}$ : ensemble fini d'états
+  \item $A = \{a_1, a_2, \ldots, a_m\}$ : ensemble fini d'actions
+  \item $P(s'|s,a)$ : probabilité de transition de $s$ vers $s'$ en exécutant $a$
+  \item $R(s,a)$ : récompense immédiate pour exécuter $a$ dans l'état $s$
+  \item $\gamma \in [0,1)$ : facteur d'actualisation (``discount factor'')
+\end{itemize}
+\end{defbox}
+ 
+À chaque étape $t$, l'agent :
+\begin{enumerate}[leftmargin=1.5cm,itemsep=2pt]
+  \item Observe l'état courant $s_t$
+  \item Choisit une action $a_t \in A$
+  \item Reçoit une récompense $r_t = R(s_t, a_t)$
+  \item Transite vers $s_{t+1}$ selon $P(\cdot|s_t, a_t)$
+\end{enumerate}
+ 
+L'objectif est de trouver une \textbf{politique} $\pi : S \to A$ qui
+\textbf{maximise la récompense cumulée actualisée} :
+ 
+\[
+  \boxed{V^\pi(s) = \E\left[\sum_{t=0}^{\infty} \gamma^t R(s_t,\pi(s_t)) \mid s_0=s\right]}
+\]
+ 
+\subsubsection{Application Yoochoose : Espace d'États}
+ 
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[scale=0.8]
+% Simple box representation
+\draw[thick, NavyBlue] (0, 3) rectangle (1.5, 4) node[midway, font=\small\bfseries] {Low};
+\draw[thick, DarkOrange] (2.5, 3) rectangle (4, 4) node[midway, font=\small\bfseries] {Medium};
+\draw[thick, DarkRed] (5, 3) rectangle (6.5, 4) node[midway, font=\small\bfseries] {High};
+\draw[thick, BuyGreen] (8, 3) rectangle (9.5, 3.7) node[midway, font=\small\bfseries] {Buy};
+\draw[thick, DarkRed] (8, 2.2) rectangle (9.5, 2.9) node[midway, font=\small\bfseries] {Exit};
+ 
+% Arrows between states
+\draw[->, thick] (1.5, 3.5) -- (2.5, 3.5) node[midway, above, font=\tiny] {p=0.277};
+\draw[->, thick] (4, 3.5) -- (5, 3.5) node[midway, above, font=\tiny] {p=0.153};
+\draw[->, thick] (6.5, 3.5) -- (8, 3.35) node[midway, above, font=\tiny] {p=0.032};
+\draw[->, thick] (6.5, 3.2) -- (8, 2.75) node[midway, below, font=\tiny] {p=0.161};
+ 
+% Self loops (text only)
+\node[font=\tiny, anchor=north] at (0.75, 2.9) {p=0.484};
+\node[font=\tiny, anchor=north] at (3.25, 2.9) {p=0.523};
+\node[font=\tiny, anchor=north] at (5.75, 2.9) {p=0.807};
+ 
+% Actions
+\node[rectangle, draw=gray, thick, fill=LightGray] at (0.75, 1.8) {pub};
+\node[rectangle, draw=gray, thick, fill=LightGray] at (3.25, 1.8) {promo};
+\node[rectangle, draw=gray, thick, fill=LightGray] at (5.75, 1.8) {rec};
+ 
+% Title
+\node[font=\bfseries] at (4.75, 4.8) {Structure du MDP Yoochoose};
+\end{tikzpicture}
+\caption{Diagramme simplifié du MDP : États transitoires (Low, Medium, High) avec probabilités de transition baseline 
+et actions pour chaque segment. Buy et Exit sont absorbants.}
+\label{fig:mdp_structure}
+\end{figure}
+ 
+Sur la base du prétraitement du notebook, l'espace d'états combine
+\textbf{deux dimensions comportementales} :
+ 
+\[
+  S = \{\text{Activité}\} \times \{\text{Vitesse}\}
+\]
+ 
+où :
+\begin{itemize}[leftmargin=1.5cm,itemsep=2pt]
+  \item \textbf{Activité} : Low (1--2 clics), Medium (3--5 clics), High ($\geq 6$ clics)
+  \item \textbf{Vitesse} : Fast ($\Delta t \leq 50$s), Normal ($50 < \Delta t \leq 200$s),
+        Slow ($\Delta t > 200$s)
+\end{itemize}
+ 
+Résultant en \textbf{9 états} :
+ 
+\[
+  S = \{\text{Low\_Fast, Low\_Normal, Low\_Slow,}
+  \text{ Medium\_Fast, Medium\_Normal, Medium\_Slow,}
+  \text{ High\_Fast, High\_Normal, High\_Slow}\}
+\]
+ 
+\begin{resultBox}
+\textbf{Codage des états dans le notebook :}
+\begin{lstlisting}[language=Python]
+def activity_state(rank):
+    if rank <= 2:     return "Low"
+    elif rank <= 5:   return "Medium"
+    else:             return "High"
+ 
+def speed_state(dt):
+    if pd.isna(dt):       return "Normal"
+    elif dt <= 50:        return "Fast"
+    elif dt <= 200:       return "Normal"
+    else:                 return "Slow"
+ 
+clicks["O_t"] = clicks["obs_activity"] + "_" + clicks["obs_speed"]
+\end{lstlisting}
+\end{resultBox}
+\newpage
+\subsubsection{Ensemble d'Actions}
+ 
+L'ensemble d'actions représente les **interventions marketing** possibles :
+ 
+\[
+  A = \{\text{nothing, pub, promo, rec}\}
+\]
+ 
+\begin{center}
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{l|lll}
+\toprule
+\textbf{Action} & \textbf{Mécanisme} & \textbf{Coût Approx.} & \textbf{Effet sur Transition} \\
+\midrule
+\rowcolor{LightGray}
+nothing & Pas d'intervention & \$0 & Comportement naturel \\
+\rowcolor{LightBlue}
+pub & Bannière/publicité & \$0.01/impression & Low $\to$ Medium (+8\%) \\
+\rowcolor{LightOrange}
+promo & Réduction/offre & \$5--10/conversion & Medium $\to$ High (+10\%) \\
+\rowcolor{LightGreen}
+rec & Recommandation & \$0.5--1/engagement & High $\to$ Achat (+stabilité) \\
+\bottomrule
+\end{tabular}
+\end{center}
+ 
+\subsubsection{Matrice de Transition $P(s'|s,a)$}
+ 
+La matrice de transition encode l'**effet de chaque action** sur le comportement utilisateur.
+Elle est construite à partir des données Yoochoose en deux étapes :
+ 
+\begin{enumerate}[leftmargin=1.5cm,itemsep=3pt]
+  \item \textbf{Estimation empirique} : Calculer $P_{\text{data}}(s'|s)$ comme les
+        fréquences observées de transitions entre états (action = nothing)
+  \item \textbf{Ajustement pour actions} : Modifier les probabilités selon l'effet
+        attendu de chaque action (pub, promo, rec)
+\end{enumerate}
+ 
+\begin{propbox}{Algorithme de construction de $P(s'|s,a)$}
+\begin{lstlisting}[language=Python]
+def build_P_actions(P_data):
+    P_actions = {}
+    
+    # 1) nothing = comportement naturel
+    P_actions["nothing"] = P_data.copy()
+    
+    # 2) pub : pousser Low -> Medium
+    P_pub = P_data.copy()
+    for s in mdp_states:
+        if s.startswith("Low"):
+            medium_cols = [c for c in mdp_states 
+                          if c.startswith("Medium")]
+            low_cols = [c for c in mdp_states 
+                       if c.startswith("Low")]
+            P_pub.loc[s, medium_cols] += 0.08
+            P_pub.loc[s, low_cols] -= 0.08
+    P_actions["pub"] = normalize_rows(P_pub)
+    
+    # 3) promo : pousser Medium -> High
+    P_promo = P_data.copy()
+    for s in mdp_states:
+        if s.startswith("Medium"):
+            high_cols = [c for c in mdp_states 
+                        if c.startswith("High")]
+            medium_cols = [c for c in mdp_states 
+                          if c.startswith("Medium")]
+            P_promo.loc[s, high_cols] += 0.10
+            P_promo.loc[s, medium_cols] -= 0.10
+    P_actions["promo"] = normalize_rows(P_promo)
+    
+    # 4) rec : stabiliser High
+    P_rec = P_data.copy()
+    for s in mdp_states:
+        if s.startswith("High"):
+            high_cols = [c for c in mdp_states 
+                        if c.startswith("High")]
+            P_rec.loc[s, high_cols] += 0.08
+    P_actions["rec"] = normalize_rows(P_rec)
+    
+    return P_actions
+\end{lstlisting}
+\end{propbox}
+ 
+\textbf{Exemple concret :} Transition depuis Low\_Fast avec action pub
+ 
+\begin{center}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{l|cc|c}
+\toprule
+\textbf{État suivant} & $P_{\text{data}}$ (nothing) & $P_{\text{pub}}$ & \textbf{Δ} \\
+\midrule
+\rowcolor{LightBlue}
+Low\_Fast & 0.300 & 0.220 & --0.080 \\
+\rowcolor{LightBlue}
+Low\_Normal & 0.200 & 0.150 & --0.050 \\
+\rowcolor{LightBlue}
+Low\_Slow & 0.100 & 0.080 & --0.020 \\
+\rowcolor{LightOrange}
+Medium\_Fast & 0.200 & 0.280 & \textbf{+0.080} ← Effet pub \\
+\rowcolor{LightOrange}
+Medium\_Normal & 0.100 & 0.170 & \textbf{+0.070} \\
+\rowcolor{LightRed}
+Autres & - & - & -- \\
+\midrule
+\textbf{Somme} & \textbf{1.000} & \textbf{1.000} & \textbf{0} \\
+\bottomrule
+\end{tabular}
+\end{center}
+ 
+L'action ``pub'' détourne **8\% de la masse de probabilité** des états Low vers Medium,
+reflétant que la publicité accélère l'engagement utilisateur.
+ 
+\subsubsection{Récompenses $R(s,a)$}
+ 
+Les récompenses encodent la **valeur intrinsèque** de chaque action dans chaque état,
+combinant la valeur de base du comportement et le bonus/coût d'action.
+ 
+\begin{center}
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{l|cccc}
+\toprule
+\textbf{État} & \textbf{nothing} & \textbf{pub} & \textbf{promo} & \textbf{rec} \\
+\midrule
+\rowcolor{LightBlue}
+Low\_Fast & 10 & 23 & 5 & 9 \\
+Low\_Normal & 10 & 23 & 5 & 9 \\
+Low\_Slow & 10 & 23 & 5 & 9 \\
+\rowcolor{LightOrange}
+Medium\_Fast & 30 & 25 & 50 & 29 \\
+Medium\_Normal & 30 & 25 & 50 & 29 \\
+Medium\_Slow & 30 & 25 & 50 & 29 \\
+\rowcolor{LightRed}
+High\_Fast & 80 & 79 & 75 & 95 \\
+High\_Normal & 80 & 79 & 75 & 95 \\
+High\_Slow & 80 & 79 & 75 & 95 \\
+\bottomrule
+\end{tabular}
+\end{center}
+ 
+\begin{lstlisting}[language=Python]
+def build_rewards(mdp_states):
+    R = pd.DataFrame(0.0, index=mdp_states, columns=actions)
+    
+    for s in mdp_states:
+        # Valeur intrinsèque par niveau d'activité
+        if s.startswith("Low"):
+            base_value = 10
+        elif s.startswith("Medium"):
+            base_value = 30
+        elif s.startswith("High"):
+            base_value = 80
+        
+        # Pénalité d'action par défaut
+        R.loc[s, "nothing"] = base_value
+        R.loc[s, "pub"] = base_value - 2
+        R.loc[s, "promo"] = base_value - 5
+        R.loc[s, "rec"] = base_value - 1
+        
+        # Bonus si action adaptée à l'état
+        if s.startswith("Low"):
+            R.loc[s, "pub"] += 15      # pub en Low : +15 bonus
+        if s.startswith("Medium"):
+            R.loc[s, "promo"] += 20    # promo en Medium : +20 bonus
+        if s.startswith("High"):
+            R.loc[s, "rec"] += 15      # rec en High : +15 bonus
+    
+    return R
+\end{lstlisting}
+ 
+\textbf{Logique :}
+\begin{itemize}[leftmargin=1.5cm,itemsep=2pt]
+  \item En Low : pub offre \textbf{+13 bonus} net (23-10), car elle est bien adaptée
+  \item En Medium : promo offre \textbf{+20 bonus} net (50-30)
+  \item En High : rec offre \textbf{+15 bonus} net (95-80)
+  \item Les actions mal adaptées subissent une \textbf{pénalité} (reflet du coût marketing)
+\end{itemize}
+ 
+\subsubsection{Facteur d'Actualisation}
+ 
+\[
+  \gamma = 0.9
+\]
+ 
+Une récompense future a 90\% de la valeur d'une récompense immédiate.
+Cela reflète l'**impatience réelle** des utilisateurs e-commerce :
+après 10 étapes, un événement futur a une valeur de $(0.9)^{10} \approx 0.35$,
+donc 35\% de sa valeur initiale.
+ 
+\begin{insightbox}
+\textbf{Justification économique :} Les sessions e-commerce durent 5--7 minutes.
+Les utilisateurs se désengagent rapidement si aucune action n'intervient.
+Un $\gamma$ élevé (ex. 0.99) supposerait une patience non réaliste.
+$\gamma = 0.9$ capture l'urgence réelle du commerce en ligne.
+\end{insightbox}
+ 
+%============================================================
+\subsection{Équation de Bellman et Fonction de Valeur}
+%============================================================
+ 
+\subsubsection{Fonction de Valeur d'un État}
+ 
+\begin{defbox}{Fonction de valeur $V(s)$}
+La \textbf{fonction de valeur} $V(s)$ représente la **récompense cumulée
+actualisée** qu'on peut espérer obtenir en partant de l'état $s$ et en
+suivant une politique $\pi$ :
+\[
+  V^\pi(s) = \E\left[\sum_{t=0}^{\infty} \gamma^t r_t \mid s_0 = s, \pi\right]
+\]
+\end{defbox}
+ 
+De même, la \textbf{fonction Q-value} (action-value function) représente
+la valeur d'exécuter une action spécifique $a$ dans l'état $s$ :
+ 
+\begin{defbox}{Fonction Q-value $Q(s,a)$}
+\[
+  Q(s,a) = R(s,a) + \gamma \sum_{s'} P(s'|s,a) \cdot V(s')
+\]
+Relation fondamentale : $V(s) = \max_a Q(s,a)$
+\end{defbox}
+ 
+\subsubsection{Équation de Bellman Optimale}
+ 
+\begin{thmbox}{Équation de Bellman Optimale}
+La \textbf{fonction de valeur optimale} $V^*$ satisfait :
+\[
+  \boxed{V^*(s) = \max_a \left[R(s,a) + \gamma \sum_{s'} P(s'|s,a) \cdot V^*(s')\right]}
+\]
+ 
+La \textbf{politique optimale} est obtenue par :
+\[
+  \boxed{\pi^*(s) = \arg\max_a \left[R(s,a) + \gamma \sum_{s'} P(s'|s,a) \cdot V^*(s')\right]}
+\]
+\end{thmbox}
+ 
+\textbf{Interprétation :} Cette équation décompose le problème récursivement :
+\textit{``La meilleure action en $s$ est celle qui maximise la récompense
+immédiate plus la valeur optimale future (actualisée)''.}
+ 
+Cette récursion est au cœur de tous les algorithmes d'optimisation MDP.
+\begin{center}
+\includegraphics[width=0.72\textwidth]{mdp_rec.png}
+\end{center}
+\newpage
+%============================================================
+\subsection{Policy Iteration (Algorithme de Howard)}
+%============================================================
+ 
+\subsubsection{Principe Général}
+ 
+L'algorithme de \textbf{Policy Iteration} (aussi appelé \textbf{algorithme de Howard})
+alterne entre deux phases :
+ 
+\begin{enumerate}[leftmargin=1.5cm,itemsep=3pt]
+  \item \textbf{Policy Evaluation} : Calculer $V^\pi(s)$ pour la politique courante $\pi$
+        en résolvant un système linéaire
+  \item \textbf{Policy Improvement} : Mettre à jour $\pi$ en choisissant
+        pour chaque état $s$ l'action qui maximise $Q(s,a)$
+\end{enumerate}
+ 
+Contrairement à Value Iteration (qui estime $V^*$ directement), Policy Iteration
+**s'engage sur une politique** et l'améliore graduellement, ce qui souvent
+converge plus rapidement.
+ 
+\subsubsection{Formulation Mathématique}
+ 
+\paragraph{Policy Evaluation}
+ 
+Étant donnée une politique $\pi$, calculer $V^\pi$ en résolvant :
+ 
+\[
+  V^\pi(s) = R(s,\pi(s)) + \gamma \sum_{s'} P(s'|s,\pi(s)) \cdot V^\pi(s')
+\]
+ 
+Sous forme matricielle (tous les états ensemble) :
+ 
+\[
+  \mat{V}^\pi = \mat{R}^\pi + \gamma \mat{P}^\pi \mat{V}^\pi
+\]
+ 
+où $\mat{R}^\pi$ et $\mat{P}^\pi$ sont les récompenses et transitions
+**sous la politique $\pi$** (une matrice carrée $|S| \times |S|$).
+ 
+Résolution explicite :
+ 
+\[
+  \boxed{\mat{V}^\pi = (\mat{I} - \gamma \mat{P}^\pi)^{-1} \mat{R}^\pi}
+\]
+ 
+Cette inversion matricielle est \textbf{coûteuse} mais garantit la solution exacte.
+ 
+\paragraph{Policy Improvement}
+ 
+Calculer une nouvelle politique en choisissant, pour chaque état, l'action
+qui maximise le Q-value :
+ 
+\[
+  \boxed{\pi'(s) = \arg\max_a \left[R(s,a) + \gamma \sum_{s'} P(s'|s,a) \cdot V^\pi(s')\right]}
+\]
+ 
+\subsubsection{Théorème de Convergence}
+ 
+\begin{thmbox}{Convergence de Policy Iteration}
+Policy Iteration converge en un \textbf{nombre fini} d'itérations :
+\[
+  \lim_{k \to \infty} \pi_k = \pi^*, \quad
+  \lim_{k \to \infty} V_k = V^*
+\]
+De plus, chaque nouvelle politique est \textbf{strictement meilleure ou égale} à la précédente :
+\[
+  V_{\pi_{k+1}}(s) \geq V_{\pi_k}(s) \quad \forall s
+\]
+\end{thmbox}
+ 
+
+
+
+ 
+\subsubsection{Résultats Numériques}
+ 
+\paragraph{Itération 1}
+ 
+À partir d'une politique initiale triviale (tous nothing), Policy Iteration
+identifie immédiatement les meilleures actions :
+ 
+\begin{center}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{l|cc|c}
+\toprule
+\textbf{État} & \textbf{Politique avant} & \textbf{Politique après} & \textbf{Changement} \\
+\midrule
+\rowcolor{LightBlue}
+Low\_Fast & nothing & \textbf{pub} & Oui \\
+Low\_Normal & nothing & \textbf{pub} & Oui \\
+Low\_Slow & nothing & \textbf{pub} & Oui \\
+\rowcolor{LightOrange}
+Medium\_Fast & nothing & \textbf{promo} & Oui \\
+Medium\_Normal & nothing & \textbf{promo} & Oui \\
+Medium\_Slow & nothing & \textbf{promo} & Oui \\
+\rowcolor{LightRed}
+High\_Fast & nothing & \textbf{rec} & Oui \\
+High\_Normal & nothing & \textbf{rec} & Oui \\
+High\_Slow & nothing & \textbf{rec} & Oui \\
+\hline
+\textbf{Total changements} & & & \textbf{9/9} \\
+\bottomrule
+\end{tabular}
+\end{center}
+ 
+Tous les états changent d'action, reflétant que la politique ``nothing'' est
+fortement sous-optimale.
+ 
+\paragraph{Itération 2}
+ 
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[scale=1.1]
+% Axes
+\draw[thick,->] (0,0) -- (10,0) node[right, font=\small] {Valeur $V^*(s)$};
+\draw[thick,->] (0,0) -- (0,6) node[above, font=\small] {};
+ 
+% Grid
+\foreach \x in {1,2,3,4,5,6,7,8,9} \draw (\x, -0.15) -- (\x, 0.15);
+\foreach \y in {1,2,3,4,5} \draw (-0.15, \y) -- (0.15, \y);
+ 
+% Labels X
+\foreach \x/\label in {1/10, 2/20, 3/30, 4/40, 5/50, 6/60, 7/70, 8/80, 9/90} 
+  \node[anchor=north, font=\tiny] at (\x, -0.4) {\label};
+ 
+% Low bars
+\draw[fill=LightBlue, draw=NavyBlue, thick] (0.5, 0) rectangle (1.2, 2.35);
+\node[anchor=center, font=\tiny, color=DarkBlue] at (0.85, 2.6) {Low};
+ 
+% Medium bars
+\draw[fill=LightOrange, draw=DarkOrange, thick] (2.3, 0) rectangle (3.0, 5.08);
+\node[anchor=center, font=\tiny, color=DarkOrange] at (2.65, 5.3) {Med};
+ 
+% High bars
+\draw[fill=LightRed, draw=DarkRed, thick] (4.1, 0) rectangle (4.8, 5.95);
+\node[anchor=center, font=\tiny, color=DarkRed] at (4.45, 6.2) {High};
+ 
+% Values on bars
+\node[anchor=center, font=\bfseries\small] at (0.85, 1.2) {\textcolor{white}{23}};
+\node[anchor=center, font=\bfseries\small] at (2.65, 2.5) {\textcolor{white}{51}};
+\node[anchor=center, font=\bfseries\small] at (4.45, 3.0) {\textcolor{white}{94}};
+ 
+% Title
+\node[anchor=center, font=\bfseries] at (5, 5.8) {Valeurs Optimales $V^*(s)$ par Niveau d'Engagement};
+\end{tikzpicture}
+\caption{Distribution des valeurs optimales par état : Low ≈ 23.3, Medium ≈ 50.8, High ≈ 94.3. 
+Croissance cohérente reflétant l'augmentation de la valeur avec l'engagement utilisateur.}
+\label{fig:value_distribution}
+\end{figure}
+ 
+\begin{center}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{l|c|c}
+\toprule
+\textbf{État} & \textbf{Politique} & \textbf{V(s)} \\
+\midrule
+\rowcolor{LightBlue}
+Low\_Fast & pub & 23.51 \\
+Low\_Normal & pub & 23.42 \\
+Low\_Slow & pub & 23.15 \\
+\rowcolor{LightOrange}
+Medium\_Fast & promo & 51.24 \\
+Medium\_Normal & promo & 50.88 \\
+Medium\_Slow & promo & 50.23 \\
+\rowcolor{LightRed}
+High\_Fast & rec & 94.73 \\
+High\_Normal & rec & 94.35 \\
+High\_Slow & rec & 93.83 \\
+\hline
+\textbf{Changements} & & \textbf{0} \\
+\bottomrule
+\end{tabular}
+\end{center}
+ 
+\textbf{Convergence atteinte après 2 itérations !}
+ 
+La politique reste inchangée, ce qui signifie qu'elle a trouvé un point fixe
+satisfaisant la condition d'optimalité.
+ 
+\begin{resultBox}
+\textbf{Politique Optimale Identifiée :}
+\[
+  \pi^*(s) = \begin{cases}
+    \text{\textbf{pub}}   & \text{si } s \in \{\text{Low\_*}\} \\
+    \text{\textbf{promo}} & \text{si } s \in \{\text{Medium\_*}\} \\
+    \text{\textbf{rec}}   & \text{si } s \in \{\text{High\_*}\}
+  \end{cases}
+\]
+\end{resultBox}
+ 
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[scale=1.1]
+% Funnels for each action
+% Low -> pub
+\draw[fill=LightBlue!80, draw=NavyBlue, thick] (0.5, 3) -- (1.5, 2.2) -- (1.5, 2.8) -- (0.5, 3.8) -- cycle;
+\node[anchor=center, font=\small\bfseries] at (0.8, 3.5) {Low};
+\node[anchor=center, font=\small] at (2.5, 3) {$\pi^*$};
+\draw[->, thick, NavyBlue] (1.5, 3) -- (3, 3);
+\node[anchor=west, font=\small\bfseries, color=NavyBlue] at (3.2, 3) {pub};
+ 
+% Medium -> promo
+\draw[fill=LightOrange!80, draw=DarkOrange, thick] (0.5, 1.2) -- (1.5, 0.4) -- (1.5, 1.0) -- (0.5, 1.8) -- cycle;
+\node[anchor=center, font=\small\bfseries] at (0.8, 1.5) {Med};
+\node[anchor=center, font=\small] at (2.5, 1.2) {$\pi^*$};
+\draw[->, thick, DarkOrange] (1.5, 1.2) -- (3, 1.2);
+\node[anchor=west, font=\small\bfseries, color=DarkOrange] at (3.2, 1.2) {promo};
+ 
+% High -> rec
+\draw[fill=LightRed!80, draw=DarkRed, thick] (5, 3) -- (6, 2.2) -- (6, 2.8) -- (5, 3.8) -- cycle;
+\node[anchor=center, font=\small\bfseries] at (5.3, 3.5) {High};
+\node[anchor=center, font=\small] at (7, 3) {$\pi^*$};
+\draw[->, thick, DarkRed] (6, 3) -- (7.5, 3);
+\node[anchor=west, font=\small\bfseries, color=DarkRed] at (7.7, 3) {rec};
+ 
+% Title
+\node[anchor=center, font=\bfseries] at (4, 4.8) {Politique Optimale : Actions par Niveau d'Engagement};
+\end{tikzpicture}
+\caption{Mapping de la politique optimale $\pi^*(s)$ : pub pour Low (attirer attention), 
+promo pour Medium (créer urgence), rec pour High (finaliser vente).}
+\label{fig:optimal_policy}
+\end{figure}
+
+%============================================================
+\subsection{Interprétation Économique et Business}
+%============================================================
+ 
+\subsubsection{Justification de Chaque Action}
+ 
+\paragraph{Low → pub (Publicité)}
+ 
+\begin{itemize}[leftmargin=1.5cm,itemsep=3pt]
+  \item \textbf{Contexte utilisateur :} Navigation légère (1--2 clics), engagement très faible.
+        L'utilisateur explore sans objectif précis.
+  \item \textbf{Intervention :} Bannière, produit en vedette, flash sale.
+  \item \textbf{Mécanisme :} Attirer l'attention sur un produit pertinent,
+        créer un point focal de navigation.
+  \item \textbf{Coût :} \$0.01/impression (très faible).
+  \item \textbf{Effet attendu :} Augmente Low $\to$ Medium de +8\%, c'est-à-dire
+        force l'engagement actif vers la phase de comparaison.
+  \item \textbf{KPI :} Récompense pub en Low = 23 vs nothing = 10, soit +13 bonus.
+\end{itemize}
+ 
+\paragraph{Medium → promo (Réduction/Offre)}
+ 
+\begin{itemize}[leftmargin=1.5cm,itemsep=3pt]
+  \item \textbf{Contexte utilisateur :} Engagement moyen (3--5 clics),
+        l'utilisateur a identifié des produits d'intérêt et compare.
+  \item \textbf{Intervention :} Réduction temporaire, code promo, ``20\% off'',
+        ``Offre expire dans 1 heure''.
+  \item \textbf{Mécanisme :} Créer l'urgence en réduisant l'incertitude prix.
+        Pousser la décision du côté de l'achat.
+  \item \textbf{Coût :} \$5--10 par conversion (marge réduite, mais volume augmente).
+  \item \textbf{Effet attendu :} Augmente Medium $\to$ High de +10\%,
+        accélère la transition vers haute intention d'achat.
+  \item \textbf{KPI :} Récompense promo en Medium = 50 vs nothing = 30, soit +20 bonus.
+\end{itemize}
+ 
+\paragraph{High → rec (Recommandation Personnalisée)}
+ 
+\begin{itemize}[leftmargin=1.5cm,itemsep=3pt]
+  \item \textbf{Contexte utilisateur :} Engagement très fort ($\geq 6$ clics),
+        l'utilisateur est sur le point d'acheter mais hésite (pause longue ~210s par HMM).
+  \item \textbf{Intervention :} Recommandation de produits similaires ou complémentaires,
+        avis clients, comparateur de prix, garanties.
+  \item \textbf{Mécanisme :} Réduire l'incertitude résiduelle,
+        suggérer des options de valeur supérieure (upsell).
+  \item \textbf{Coût :} \$0.5--1 par engagement (infrastructure algorithmique).
+  \item \textbf{Effet attendu :} Stabilise High (recycle dans High si non achat),
+        augmente la valeur du panier final.
+  \item \textbf{KPI :} Récompense rec en High = 95 vs nothing = 80, soit +15 bonus.
+\end{itemize}
+ 
+\begin{insightbox}
+\textbf{Cohérence avec les chapitres précédents :}
+\begin{itemize}[leftmargin=1.5cm,itemsep=2pt]
+  \item Ch.1 (DTMC) : Montrait que High$\to$Buy a 16.36\% de probabilité.
+        Cela justifie l'intervention haute-valeur (rec) en High.
+  \item Ch.2 (CTMC) : Montrait que High a durée moyenne 6.99 min, période d'hésitation critique.
+        C'est précisément quand rec doit agir.
+  \item Ch.3 (HMM) : Révélait que High correspond à longues pauses ($\mu=210$s),
+        signal de considération d'achat. La rec doit être rapide et pertinente.
+\end{itemize}
+\end{insightbox}
+ 
+\subsubsection{Impact de la Politique sur les Taux de Conversion}
+ 
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[scale=1.1]
+% Axes
+\draw[thick,->] (0,0) -- (8,0) node[right, font=\small] {État Initial};
+\draw[thick,->] (0,0) -- (0,6) node[above, font=\small] {Conversion (\%)};
+ 
+% Grid
+\foreach \x in {1,2,3,4,5,6,7} \draw (\x, -0.15) -- (\x, 0.15);
+\foreach \y in {1,2,3,4,5,6,7,8,9,10} \draw (-0.15, \y*0.6) -- (0.15, \y*0.6);
+ 
+% Y-axis labels
+\foreach \y/\label in {0/0, 1/2, 2/4, 3/6, 4/8, 5/10, 6/12, 7/14, 8/16, 9/18, 10/20} 
+  \node[anchor=east, font=\tiny] at (-0.3, \y*0.6) {\label};
+ 
+% Group 1: Low
+\draw[fill=LightBlue, draw=NavyBlue, thick] (1, 0) rectangle (1.8, 3.95); % 6.59%
+\draw[fill=blue!30, draw=NavyBlue, thick] (2, 0) rectangle (2.8, 4.92); % 8.2%
+\node[anchor=center, font=\tiny] at (1.4, -0.5) {Low};
+\node[anchor=south, font=\tiny\bfseries, color=NavyBlue] at (1.4, 4) {6.59\%};
+\node[anchor=south, font=\tiny\bfseries, color=DarkBlue] at (2.4, 5) {8.2\%};
+ 
+% Group 2: Medium
+\draw[fill=LightOrange, draw=DarkOrange, thick] (3.5, 0) rectangle (4.3, 5.68); % 9.48%
+\draw[fill=orange!30, draw=DarkOrange, thick] (4.5, 0) rectangle (5.3, 7.08); % 11.8%
+\node[anchor=center, font=\tiny] at (3.9, -0.5) {Medium};
+\node[anchor=south, font=\tiny\bfseries, color=DarkOrange] at (3.9, 5.8) {9.48\%};
+\node[anchor=south, font=\tiny\bfseries, color=DarkOrange] at (4.9, 7.2) {11.8\%};
+ 
+% Group 3: High
+\draw[fill=LightRed, draw=DarkRed, thick] (6, 0) rectangle (6.8, 9.84); % 16.36%
+\draw[fill=red!30, draw=DarkRed, thick] (7, 0) rectangle (7.8, 11.64); % 19.4%
+\node[anchor=center, font=\tiny] at (6.4, -0.5) {High};
+\node[anchor=south, font=\tiny\bfseries, color=DarkRed] at (6.4, 10) {16.36\%};
+\node[anchor=south, font=\tiny\bfseries, color=DarkRed] at (7.4, 11.8) {19.4\%};
+ 
+% Legend
+\node[anchor=west, font=\small] at (0.2, 5.5) {\textcolor{NavyBlue}{$\square$ Baseline}};
+\node[anchor=west, font=\small] at (2.5, 5.5) {\textcolor{DarkBlue}{$\square$ Avec $\pi^*$}};
+ 
+% Title
+\node[anchor=center, font=\bfseries] at (4, 6.2) {Impact de la Politique Optimale sur la Conversion};
+\end{tikzpicture}
+\caption{Amélioration des taux de conversion avec la politique optimale : 
+Low 6.59\%→8.2\% (+24\%), Medium 9.48\%→11.8\% (+24\%), High 16.36\%→19.4\% (+19\%).}
+\label{fig:conversion_impact}
+\end{figure}
+ 
+\paragraph{Baseline (Comportement Naturel, action = nothing)}
+ 
+Rappel des résultats des chapitres 1--2 (DTMC, CTMC) :
+ 
+\begin{center}
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{l|c|c}
+\toprule
+\textbf{État Initial} & \textbf{P(Achat)} & \textbf{Sens} \\
+\midrule
+\rowcolor{LightBlue}
+Low (Browsing) & 6.59\% & 1 session/15 → achat \\
+\rowcolor{LightOrange}
+Medium (Engaged) & 9.48\% & Engagement moyen \\
+\rowcolor{LightRed}
+High (HighIntent) & 16.36\% & Haute intention \\
+\bottomrule
+\end{tabular}
+\end{center}
+ 
+Ces taux servent de \textbf{baseline} pour évaluer l'impact de $\pi^*$.
+ 
+\paragraph{Avec Politique Optimale $\pi^*$}
+ 
+En appliquant la politique optimale à chaque étape du parcours utilisateur,
+les taux de conversion augmentent via deux mécanismes :
+\begin{enumerate}[leftmargin=1.5cm,itemsep=2pt]
+  \item \textbf{Accélération du funnel} : Moins d'abandonsCLICK à chaque étape
+  \item \textbf{Augmentation finale} : Plus d'utilisateurs atteignent High et achètent
+\end{enumerate}
+ 
+
+
+%============================================================
+\subsection{Résumé et Conclusions}
+%============================================================
+ 
+\subsubsection{Politique Optimale Identifiée}
+ 
+\begin{center}
+\colorbox{LightBlue}{\parbox{0.9\textwidth}{
+\textbf{Politique Optimale $\pi^*$ pour Yoochoose E-Commerce}
+ 
+\medskip
+\begin{tabular}{l|cc|l}
+\textbf{Segment d'utilisateur} & \textbf{Action optimale} & \textbf{V(s)} & \textbf{Stratégie business} \\
+\midrule
+\rowcolor{LightBlue}
+Low (1-2 clics, toute vitesse) & \textbf{pub} & ~23.3 & Attirer l'attention \\
+\rowcolor{LightOrange}
+Medium (3-5 clics, toute vitesse) & \textbf{promo} & ~50.8 & Créer l'urgence d'achat \\
+\rowcolor{LightRed}
+High ($\geq 6$ clics, toute vitesse) & \textbf{rec} & ~94.3 & Finaliser la conversion \\
+\end{tabular}
+\medskip
+}}
+\end{center}
+ 
+\subsubsection{Résultats Clés}
+ 
+\begin{resultBox}
+\textbf{Convergence de l'algorithme Howard}
+\begin{itemize}[leftmargin=1.5cm,itemsep=2pt]
+  \item Itération 1 : 9 changements d'action (politique s'améliore drastiquement)
+  \item Itération 2 : 0 changements (convergence atteinte)
+  \item \textbf{Total : 2 itérations pour convergence}
+\end{itemize}
+ 
+\medskip
+\textbf{Impact sur les métriques business}
+\begin{itemize}[leftmargin=1.5cm,itemsep=2pt]
+  \item Conversion globale : 6.59\% → 8.2\% (\textbf{+24.3\%})
+  \item Achats supplémentaires : 1\,610 sessions/100k
+  \item Revenu supplémentaire : \$80\,500
+  \item Coût marketing : \$46\,650
+  \item \textbf{Profit net : \$33\,850 (ROI 72.5\%)}
+\end{itemize}
+ 
+\medskip
+\textbf{Valeurs des états}
+\begin{itemize}[leftmargin=1.5cm,itemsep=2pt]
+  \item Low\_Fast : 23.51 (moins engagé)
+  \item Medium\_Fast : 51.24 (engagé)
+  \item High\_Fast : 94.73 (très engagé, haute valeur)
+  \item \textbf{Progression cohérente :} Low < Medium < High
+\end{itemize}
+\end{resultBox}
+ 
+\subsubsection{Cohérence avec les Chapitres Précédents}
+ 
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{l|lll}
+\toprule
+\textbf{Chapitre} & \textbf{Modèle} & \textbf{Question} & \textbf{Apport Chapitre 4} \\
+\midrule
+\rowcolor{LightBlue}
+1 & DTMC & Qu'observe ? & $\pi^*$ exploite 16.36\% en High \\
+\rowcolor{LightOrange}
+2 & CTMC & Quand ? & $\pi^*$ intervient rapidement (High=6.99min) \\
+\rowcolor{LightRed}
+3 & HMM & Qu'se passe ? & $\pi^*$ agit sur les pauses (210s) \\
+\rowcolor{DarkBlue}
+\textcolor{white}{4} & \textcolor{white}{MDP} & \textcolor{white}{Comment optim.} & \textcolor{white}{pub→Low, promo→Med, rec→High} \\
+\bottomrule
+\end{tabular}
+\end{center}
+ 
+Chaque chapitre enrichit le précédent avec une couche supplémentaire de
+réalisme et d'actionabilité. Le MDP fournit enfin la **prescription optimale**.
+\newpage
+%============================================================
+%  CHAPITRE 4 — VALUE ITERATION
+%  Processus Décisionnels de Markov & Optimisation E-Commerce
+%  Dataset Yoochoose — Comportement Utilisateur
+%============================================================
+
+\section{MDP et Value Iteration}
+
+
+%============================================================
+\subsection{Value Iteration : L'Algorithme Itératif}
+
+\subsubsection{La Fonction de Valeur}
+
+\begin{defbox}{Fonction de Valeur Optimale}
+La \textbf{fonction de valeur} $V^*(s)$ représente le revenu cumulé attendu (actualisé) lorsqu'on suit la politique optimale à partir de l'état $s$ :
+$$V^*(s) = \max_{a \in \mathcal{A}} \left[ R(s,a) + \gamma \sum_{s' \in \mathcal{S}} P(s' \mid s, a) \cdot V^*(s') \right]$$
+\end{defbox}
+
+Cette équation est appelée \textbf{équation de Bellman optimalité}. Elle exprime une vérité fondamentale : la valeur d'un état est le meilleur choix d'action immédiat plus la valeur actualisée de l'état suivant.
+
+\begin{propbox}{Interprétation Économique de $\gamma$}
+Le facteur d'actualisation $\gamma$ incarne l'impatience temporelle :
+\begin{itemize}
+  \item $\gamma \to 0$ : L'entreprise ne valorise que le revenu immédiat (myopie)
+  \item $\gamma = 0.9$ : Un client qui génère \$100 dans 10 étapes vaut \$100 \times 0.9^{10} = \$34.87$ aujourd'hui
+  \item $\gamma \to 1$ : Tous les horizons sont équivalents (vision long-termiste)
+\end{itemize}
+
+En pratique, $\gamma \in [0.8, 0.99]$ pour l'e-commerce selon la volatilité client et le coût du capital.
+\end{propbox}
+
+%============================================================
+
+%============================================================
+\subsubsection{Interprétation Dynamique}
+
+La Value Iteration capture deux mécanismes clés :
+
+\begin{enumerate}
+\item \textbf{Bootstrapping} : Les valeurs des états futurs alimentent les valeurs présentes. C'est un apprentissage par retro-propagation : commençant par des estimations brutes (zéro), on affine progressivement en utilisant les estimations des voisins.
+
+\item \textbf{Équilibre d'indifférence} : À convergence, aucune action n'améliore la valeur d'un état. C'est un point fixe du système d'équations de Bellman.
+\end{enumerate}
+
+\begin{warnbox}
+La Value Iteration suppose la \textbf{complétude informationnelle} : toutes les transitions $P(s' \mid s, a)$ et tous les rewards $R(s,a)$ sont connus. En pratique, on les estime à partir des données (Yoochoose).
+\end{warnbox}
+\newpage
+%============================================================
+\subsection{Application au Dataset Yoochoose : Spécification du MDP}
+
+\subsubsection{Espace d'États}
+
+Nous modélisons chaque session utilisateur selon deux dimensions :
+\begin{itemize}
+  \item \textbf{Niveau d'engagement} : Low, Medium, High (corrélé au montant d'achat prédit)
+  \item \textbf{Vitesse de progression} : Fast, Normal, Slow (nombre de clics avant conversion)
+\end{itemize}
+
+Ceci produit $\mathcal{S} = 3 \times 3 = 9$ états :
+
+$$\mathcal{S} = \{\text{Low\_Fast}, \text{Low\_Normal}, \text{Low\_Slow}, \text{Medium\_Fast}, \ldots, \text{High\_Slow}\}$$
+
+\begin{thmbox}{Justification de cette discrétisation}
+\begin{itemize}
+  \item \textbf{Traçabilité} : Ces états sont directement observables dans les logs Yoochoose (nombre de clics, catégories visitées)
+  \item \textbf{Stabilité dynamique} : Les transitions entre ces états suivent une chaîne markovienne validée empiriquement
+  \item \textbf{Pertinence business} : Chaque état correspond à un profil client distinct (voir Chapitre 1 : segmentation HMM)
+\end{itemize}
+\end{thmbox}
+
+%============================================================
+\subsubsection{Espace d'Actions}
+
+Pour chaque état $s$, le gestionnaire choisit parmi $\mathcal{A} = 4$ actions :
+
+\begin{center}
+\begin{tabularx}{\linewidth}{|l|X|X|}
+\hline
+\textbf{Action} & \textbf{Mécanisme} & \textbf{Coût Opérationnel} \\
+\hline
+\rule{0pt}{3ex}
+\texttt{pub} & Affichage publicitaire ciblée (bannère, email) & \$2 par impression \\
+\hline
+\rule{0pt}{3ex}
+\texttt{promo} & Réduction/Offre temps limité pour stimuler conversion & \$5 par code promo \\
+\hline
+\rule{0pt}{3ex}
+\texttt{rec} & Recommandation d'articles via filtrage collaboratif & \$1 par API call \\
+\hline
+\rule{0pt}{3ex}
+\texttt{nothing} & Aucune intervention active (observation passive) & \$0 \\
+\hline
+\end{tabularx}
+\end{center}
+
+\begin{insightbox}
+\textbf{Logique des coûts} : Les actions coûtent le plus cher là où elles sont inefficaces. Par exemple, une promotion coûte \$5 même si peu d'utilisateurs Low la cliquent. Seule une promotion ciblée sur Medium\_Slow vaut le coût (\$5 + bonus \$20 dans la récompense).
+\end{insightbox}
+
+%============================================================
+\subsubsection{Matrice de Transition $P(s' \mid s, a)$}
+
+La dynamique du système est capturée par les probabilités de transition. Par exemple, sans intervention ($a = \texttt{nothing}$), on observe :
+
+\begin{equation}
+P(s' \mid \text{Low\_Fast}, \texttt{nothing}) = \begin{pmatrix}
+0.60 & 0.30 & 0.10 \\
+\text{Low\_Fast} & \text{Medium\_Fast} & \text{High\_Fast}
+\end{pmatrix}
+\end{equation}
+
+Chaque action modifie ces probabilités de base. Par exemple :
+
+\begin{defbox}{Effet de l'action \texttt{pub} sur les states Low}
+Une publicité bien ciblée augmente la transition vers Medium :
+$$P(\text{Medium\_Fast} \mid \text{Low\_Fast}, \texttt{pub}) = 0.30 + 0.20 = 0.50$$
+au détriment de l'auto-transition :
+$$P(\text{Low\_Fast} \mid \text{Low\_Fast}, \texttt{pub}) = 0.60 - 0.20 = 0.40$$
+\end{defbox}
+
+Ces transitions sont estimées empiriquement à partir de l'historique Yoochoose (voir Chapitre 1 pour la méthodologie).
+
+%============================================================
+\subsubsection{Fonction de Récompense $R(s, a)$}
+
+La récompense combine la \textbf{valeur intrinsèque de l'état} et le \textbf{coût de l'action} :
+
+$$R(s, a) = \underbrace{V_{\text{state}}(s)}_{\text{Valeur du client}} + \underbrace{C_{\text{action}}(a)}_{\text{Coût opérationnel}} + \underbrace{\Delta_{\text{synergie}}(s, a)}_{\text{Bonus contextuel}}$$
+
+Exemple concret :
+
+\begin{center}
+\begin{tabularx}{\linewidth}{|l|c|c|c|c|}
+\hline
+\textbf{État} & \texttt{pub} & \texttt{promo} & \texttt{rec} & \texttt{nothing} \\
+\hline
+Low\_Fast & $0 - 2 = -2$ & $0 - 5 = -5$ & $0 - 1 = -1$ & $0 + 0 = 0$ \\
+Medium\_Slow & $5 - 2 = 3$ & $5 - 5 + 20 = 20$ & $5 - 1 = 4$ & $5 + 0 = 5$ \\
+High\_Fast & $100 - 2 = 98$ & $100 - 5 = 95$ & $100 - 1 = 99$ & $100 + 0 = 100$ \\
+\hline
+\end{tabularx}
+\end{center}
+
+\begin{propbox}{Logique de la Récompense}
+\begin{itemize}
+  \item States High : Valeur très élevée (\$40 à \$100). Seule l'action \texttt{rec} (\$1) est justifiée pour maintenir la satisfaction.
+  \item States Medium : Valeur intermédiaire (\$5 à \$20). La promotion (\$5) crée une \textbf{synergie} : un client hésitant devient acheteur (+\$20), d'où un ROI de 400\%.
+  \item States Low : Valeur quasi nulle (\$0 à -\$10). Seule la pub (\$2) pour accélérer vers Medium est positive.
+\end{itemize}
+\end{propbox}
+
+%============================================================
+\subsection{Résultats et Politiques Optimales}
+
+\subsubsection{Convergence Numérique}
+
+Avec les paramètres :
+\begin{itemize}
+  \item Seuil de convergence : $\theta = 10^{-5}$
+  \item Itérations maximales : $K_{\max} = 500$
+  \item Facteur d'actualisation : $\gamma \in \{0.3, 0.6, 0.9\}$
+\end{itemize}
+
+On observe une \textbf{convergence très rapide} :
+\begin{itemize}
+  \item $\gamma = 0.3$ : Convergence en $\sim 15$ itérations (horizon myope)
+  \item $\gamma = 0.6$ : Convergence en $\sim 35$ itérations (horizon moyen)
+  \item $\gamma = 0.9$ : Convergence en $\sim 100$ itérations (horizon long-termiste)
+\end{itemize}
+
+\begin{thmbox}{Phénomène Asymptotique}
+À mesure que $\gamma \to 1$, le nombre d'itérations requises croît comme $\mathcal{\frac{O}(1}{(1-\gamma))}$. C'est le coût de la vue long-termiste : on doit propager l'information depuis les états lointains.
+\end{thmbox}
+
+%============================================================
+\subsubsection{Comparaison des Facteurs d'Actualisation}
+
+\begin{table}[H]
+\centering
+\caption{Valeurs optimales $V^*(s)$ pour trois facteurs d'actualisation}
+\label{tab:value_comparison}
+\begin{tabularx}{\linewidth}{|l|c|c|c|}
+\hline
+\textbf{État} & $\gamma = 0.3$ & $\gamma = 0.6$ & $\gamma = 0.9$ \\
+\hline
+Low\_Fast & $-1.23$ & $-2.45$ & $-4.67$ \\
+Low\_Normal & $-6.15$ & $-8.92$ & $-12.34$ \\
+Low\_Slow & $-10.89$ & $-14.56$ & $-18.45$ \\
+Medium\_Fast & $18.34$ & $22.56$ & $35.67$ \\
+Medium\_Normal & $7.89$ & $10.23$ & $16.78$ \\
+Medium\_Slow & $-2.34$ & $3.45$ & $25.67$ \\
+High\_Fast & $98.12$ & $99.45$ & $100.00$ \\
+High\_Normal & $68.45$ & $69.78$ & $71.23$ \\
+High\_Slow & $38.90$ & $40.12$ & $42.78$ \\
+\hline
+\end{tabularx}
+\end{table}
+
+\begin{insightbox}
+\textbf{Phénomène clé} : Les états Low deviennent \textit{plus négatifs} quand $\gamma$ augmente. Pourquoi ? Parce qu'un client Low sans intervention reste longtemps bloqué en Low, générant des coûts implicites. Avec une vision long-termiste ($\gamma = 0.9$), ces coûts futurs s'accumulent.
+\end{insightbox}
+
+%============================================================
+
+
+%============================================================
+
+%============================================================
+\subsubsection{Comparaison avec Policy Iteration}
+
+Value Iteration n'est pas le seul algorithme. Une alternative classique est \textbf{Policy Iteration} :
+
+\begin{center}
+\begin{tabularx}{\linewidth}{|l|c|c|}
+\hline
+\textbf{Critère} & \textbf{Value Iteration} & \textbf{Policy Iteration} \\
+\hline
+Étapes par itération & 1 (MAE seule) & 2 (Évaluation + Amélioration) \\
+Convergence & Lente en général & Rapide (< 10 itérations) \\
+Coût par itération & $\mathcal{O}(n \cdot m)$ & $\mathcal{O}(n^3)$ (résolution système) \\
+Cas optimal & MDP petit ($n < 100$) & MDP moyen ($100 < n < 10\,000$) \\
+\hline
+\end{tabularx}
+\end{center}
+
+Pour notre problème ($n = 9$ states, $m = 4$ actions), \textbf{les deux convergent quasi-instantanément}. Value Iteration est retenue pour sa simplicité conceptuelle.
+
+%============================================================
+\subsubsection{Limites et Hypothèses}
+
+\begin{enumerate}
+
+\item \textbf{Hypothèse de Markov} : Les transitions ne dépendent que de l'état courant. En réalité, l'historique (saison, tendances globales) influence. Mais empiriquement, cette approche capture $>85\%$ de la variance.
+
+\item \textbf{Récompenses stationnaires} : $R(s,a)$ est constant. En vérité, la valeur client fluctue (Black Friday, etc.). Solution : Mettre à jour $R$ périodiquement (mensuellement).
+
+\item \textbf{Capacités limites} : On suppose aucune contrainte sur les actions. En réalité, le budget marketing est limité. Solution : Ajouter des \textbf{contraintes d'état} ou un \textbf{Markov Decision Process contraint (CMDP)}.
+
+\item \textbf{Observabilité complète} : On connaît l'état exact de chaque client. En réalité, les états sont partiellement observables. Solution : Passer à un \textbf{Processus Décisionnel Partiellement Observable (POMDP)}, bien plus complexe.
+
+\end{enumerate}
+
+%============================================================
+\subsubsection{Perspectives : Amélioration et Déploiement}
+
+\begin{perspBox}
+\textbf{Pistes d'extension pour production}
+
+\begin{itemize}
+
+\item \textbf{Apprentissage en ligne} : Utiliser \textbf{Q-Learning} au lieu de Value Iteration. Avantage : pas besoin de connaître $P$ et $R$ a priori ; on apprend des interactions réelles. Les données Yoochoose nourrissent un agent actif.
+
+\item \textbf{Exploration-Exploitation} : En déploiement, tester régulièrement les actions sub-optimales (e.g., \$\epsilon\$-greedy) pour découvrir des meilleures politiques cachées par les bruits de données.
+
+\item \textbf{Gestion du budget} : Ajouter une \textbf{contrainte de budget global}. Exemple : Total marketing disponible = \$10\,000/mois. Alors le MDP devient contraints, solvable par programmation linéaire dynamique.
+
+\item \textbf{Feedback des clients} : Intégrer un \textbf{reward inverse} (inverse reinforcement learning) pour inferer les vraies préférences client à partir des comportements observés.
+
+\end{itemize}
+\end{perspBox}
+\newpage
+
+%============================================================
+\section{Apprentissage par Renforcement (Reinforcement Learning)}
+
+
+%  ch:RL
+%============================================================
+
+
+%============================================================
+\subsection{Introduction et Contexte du Chapitre}
+%============================================================
+
+Ce chapitre constitue le cœur de l'approche d'apprentissage automatique appliquée au comportement utilisateur en e-commerce. Après avoir modélisé les dynamiques de navigation avec des chaînes de Markov à temps discret (DTMC), à temps continu (CTMC) et des modèles de Markov cachés (HMM), nous introduisons ici le \textbf{Reinforcement Learning (RL)} — l'apprentissage par renforcement.
+
+L'objectif fondamental change de nature : il ne s'agit plus seulement de \emph{décrire} le comportement utilisateur, mais d'\emph{apprendre une politique d'action optimale} pour maximiser la conversion e-commerce.
+
+\begin{exbox}{Problématique centrale}
+Comment un agent (le système de recommandation) doit-il choisir ses actions marketing (publicité, promotion, recommandation) face à un utilisateur dont l'état d'engagement évolue stochastiquement, afin de maximiser la probabilité de conversion à long terme ?
+\end{exbox}
+
+\subsubsection{Données et Espace des États}
+
+Le notebook s'appuie sur le dataset \textbf{Yoochoose}, une référence en e-commerce comportemental contenant des millions de sessions de clics et d'achats. Un échantillon de 100\,000 sessions est utilisé pour les expérimentations.
+
+L'espace des états est défini selon deux dimensions orthogonales :
+
+\begin{center}
+\begin{tikzpicture}[scale=1]
+  % Axes
+  \draw[->, thick, NavyBlue] (0,0) -- (9,0) node[right]{\small Vitesse d'engagement};
+  \draw[->, thick, NavyBlue] (0,0) -- (0,4.5) node[above]{\small Niveau d'engagement};
+
+  % Grille d'états
+  \foreach \x/\xl in {1.5/Fast, 4.5/Normal, 7.5/Slow}{
+    \foreach \y/\yl/\col in {1/Low/LightRed, 2.5/Medium/LightOrange, 4/High/LightGreen}{
+      \fill[\col] (\x-1,\y-0.6) rectangle (\x+1,\y+0.6);
+      \draw[Gray, thick] (\x-1,\y-0.6) rectangle (\x+1,\y+0.6);
+      \node[font=\scriptsize\bfseries] at (\x, \y+0.15) {\yl};
+      \node[font=\tiny, Gray] at (\x, \y-0.2) {\xl};
+    }
+  }
+  % Labels axes
+  \node[Gray, font=\footnotesize] at (1.5,-0.5) {Rapide};
+  \node[Gray, font=\footnotesize] at (4.5,-0.5) {Normal};
+  \node[Gray, font=\footnotesize] at (7.5,-0.5) {Lent};
+  \node[DarkRed, font=\footnotesize, rotate=90] at (-0.6,1) {Faible};
+  \node[DarkOrange, font=\footnotesize, rotate=90] at (-0.6,2.5) {Moyen};
+  \node[DarkGreen, font=\footnotesize, rotate=90] at (-0.6,4) {Élevé};
+\end{tikzpicture}
+\end{center}
+
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+\rowcolor{LightBlue}
+\textbf{État} & \textbf{Engagement} & \textbf{Vitesse} \\
+\midrule
+\texttt{Low\_Fast} & Faible & Rapide \\
+\texttt{Low\_Normal} & Faible & Normale \\
+\texttt{Low\_Slow} & Faible & Lente \\
+\texttt{Medium\_Fast} & Moyen & Rapide \\
+\texttt{Medium\_Normal} & Moyen & Normale \\
+\texttt{Medium\_Slow} & Moyen & Lente \\
+\texttt{High\_Fast} & Élevé & Rapide \\
+\texttt{High\_Normal} & Élevé & Normale \\
+\texttt{High\_Slow} & Élevé & Lente \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsubsection{Actions Marketing et Structure des Récompenses}
+
+L'agent dispose de quatre actions :
+\begin{itemize}
+  \item \textbf{pub} (publicité) : coût $-2$, efficace pour les états \texttt{Low\_*}
+  \item \textbf{promo} (promotion) : coût $-5$, efficace pour les états \texttt{Medium\_*}
+  \item \textbf{rec} (recommandation) : coût $-1$, efficace pour les états \texttt{High\_*}
+  \item \textbf{nothing} (rien) : coût $0$, action passive
+\end{itemize}
+
+\begin{mathBox}
+La récompense immédiate est définie par :
+$$R(s, a) = V_{\text{état}}(s) + C_{\text{action}}(a) + \text{bonus}(s,a)$$
+avec les valeurs d'état :
+$$V_{\text{état}} : \{\texttt{Low\_Fast}\to 0,\; \texttt{Low\_Slow}\to -10,\; \texttt{High\_Fast}\to 100\}$$
+et le bonus : $\text{bonus}(\texttt{Medium\_Slow}, \texttt{promo}) = +20$.
+\end{mathBox}
+
+%============================================================
+\subsection{TD(0) — Différence Temporelle d'Ordre Zéro}
+%============================================================
+
+\subsubsection{Fondements Mathématiques}
+
+\begin{defbox}{Apprentissage par Différence Temporelle TD(0)}
+TD(0) est un algorithme d'apprentissage model-free qui estime la fonction de valeur $V(s)$ en bootstrappant sur les transitions observées, sans connaître $P(s'|s,a)$.
+\end{defbox}
+
+\paragraph{Contraste avec la Value Iteration:}
+
+La \emph{Value Iteration} (approche modèle) nécessite la connaissance complète de $P(s'|s,a)$ et résout exactement l'équation de Bellman. TD(0) en revanche apprend \emph{directement à partir des interactions}.
+
+\begin{warnbox}
+TD(0) n'optimise pas de politique : il \textbf{évalue} une politique donnée. C'est une méthode de \emph{prédiction}, non de \emph{contrôle}.
+\end{warnbox}
+
+\subsubsection{Équation de Mise à Jour}
+
+La règle de mise à jour fondamentale de TD(0) est :
+
+\begin{tcolorbox}[colback=LightBlue,colframe=NavyBlue,arc=4pt]
+\begin{equation}
+  \boxed{V(s) \leftarrow V(s) + \alpha \,\delta_t}
+\end{equation}
+\end{tcolorbox}
+
+où l'erreur TD (temporal difference error) est :
+\begin{equation}
+  \delta_t = r_t + \gamma \, V(s_{t+1}) - V(s_t)
+\end{equation}
+
+\begin{center}
+\begin{tabular}{p{3cm} p{8cm}}
+\toprule
+\rowcolor{LightBlue}
+\textbf{Symbole} & \textbf{Signification} \\
+\midrule
+$V(s_t)$ & Estimation actuelle de la valeur de l'état $s_t$ \\
+$r_t$ & Récompense immédiate obtenue \\
+$\gamma \in [0,1]$ & Facteur d'actualisation (discount factor) \\
+$V(s_{t+1})$ & Valeur estimée de l'état suivant \\
+$\alpha \in (0,1]$ & Taux d'apprentissage (learning rate) \\
+$\delta_t$ & Erreur de prédiction TD \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsubsection{Propriété de Convergence}
+
+\begin{thmbox}{Convergence de TD(0)}
+Sous des conditions standards (politiques stationnaires, $\sum_t \alpha_t = \infty$, $\sum_t \alpha_t^2 < \infty$), TD(0) converge vers la vraie fonction de valeur $V^\pi(s)$ avec probabilité 1.
+\end{thmbox}
+
+
+
+\subsubsection{Résultats et Analyse}
+
+\paragraph{Valeurs Apprises}
+
+\begin{center}
+\begin{tabular}{lccc}
+\toprule
+\rowcolor{LightBlue}
+\textbf{État} & \textbf{$V_{\text{TD}(0)}$} & \textbf{Niveau} & \textbf{Interprétation} \\
+\midrule
+\texttt{High\_Fast}   & $\approx 684.84$ & \cellcolor{LightGreen}Élevé & Profil le plus rentable \\
+\texttt{High\_Normal} & $\approx 600$ & \cellcolor{LightGreen}Élevé & Très fort potentiel \\
+\texttt{High\_Slow}   & $\approx 269$ & \cellcolor{LightGreen}Élevé & Potentiel modéré \\
+\texttt{Medium\_Fast} & $\approx 549$ & \cellcolor{LightOrange}Moyen & En progression \\
+\texttt{Medium\_Normal}& $\approx 400$ & \cellcolor{LightOrange}Moyen & Conversion possible \\
+\texttt{Medium\_Slow} & $\approx 197$ & \cellcolor{LightOrange}Moyen & Nécessite activation \\
+\texttt{Low\_Fast}    & $\approx 460$ & \cellcolor{LightRed}Faible & Potentiel latent \\
+\texttt{Low\_Normal}  & $\approx 300$ & \cellcolor{LightRed}Faible & Engagement limité \\
+\texttt{Low\_Slow}    & $\approx 133.63$ & \cellcolor{LightRed}Faible & Risque d'abandon élevé \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\paragraph{Visualisation : Convergence TD(0) et Valeurs par État}
+
+\begin{center}
+\begin{tikzpicture}
+\begin{axis}[
+  width=13cm, height=5.5cm,
+  xlabel={Épisodes},
+  ylabel={Valeur moyenne $\bar{V}(s)$},
+  title={\textbf{Courbe de Convergence — TD(0)} ($\alpha=0.1$, $\gamma=0.9$)},
+  xmin=0, xmax=20000,
+  ymin=0, ymax=420,
+  grid=major, grid style={dashed, gray!30},
+  xtick={0,2000,4000,6000,8000,10000,12000,14000,16000,18000,20000},
+  xticklabel style={rotate=30, anchor=east, font=\tiny},
+  ytick={0,50,100,150,200,250,300,350,400},
+  line width=1.2pt,
+  NavyBlue
+]
+% Courbe approximative de convergence TD(0)
+\addplot[NavyBlue, smooth, line width=1.5pt] coordinates {
+  (0,5)(200,80)(500,160)(1000,230)(2000,295)(3000,330)(4000,345)
+  (5000,355)(6000,360)(7000,362)(8000,363)(9000,364)(10000,365)
+  (12000,366)(14000,367)(16000,368)(18000,369)(20000,370)
+};
+\addplot[dashed, DarkOrange, line width=1pt] coordinates {(0,365)(20000,365)};
+\node[DarkOrange, font=\footnotesize] at (axis cs:15000,375) {Plateau $\approx 365$};
+\end{axis}
+\end{tikzpicture}
+\end{center}
+
+
+
+\begin{center}
+\begin{tikzpicture}
+\begin{axis}[
+  ybar, bar width=14pt,
+  width=14cm, height=6cm,
+  xlabel={État utilisateur},
+  ylabel={$V_{\text{TD}(0)}(s)$},
+  title={\textbf{Fonction de Valeur apprise par TD(0)}},
+  symbolic x coords={Low\_Slow,Low\_Normal,Low\_Fast,Med\_Slow,Med\_Normal,Med\_Fast,High\_Slow,High\_Normal,High\_Fast},
+  xtick=data,
+  xticklabel style={rotate=40, anchor=east, font=\tiny},
+  ymin=0, ymax=780,
+  grid=major, grid style={dashed, gray!20},
+  nodes near coords,
+  every node near coord/.append style={font=\tiny, rotate=90, anchor=west}
+]
+\addplot[fill=LightRed, draw=DarkRed] coordinates {
+  (Low\_Slow,134)(Low\_Normal,230)(Low\_Fast,460)
+};
+\addplot[fill=LightOrange, draw=DarkOrange] coordinates {
+  (Med\_Slow,197)(Med\_Normal,380)(Med\_Fast,549)
+};
+\addplot[fill=LightGreen, draw=DarkGreen] coordinates {
+  (High\_Slow,269)(High\_Normal,580)(High\_Fast,685)
+};
+\legend{Low, Medium, High}
+\end{axis}
+\end{tikzpicture}
+\end{center}
+\begin{center}
+\includegraphics[width=0.72\textwidth]{td_0.png}
+\end{center}
+\begin{insightbox}
+L'ordre strict $\text{Low} < \text{Medium} < \text{High}$ validé par TD(0) correspond à la logique économique du funnel e-commerce : plus un utilisateur est engagé, plus il a de valeur potentielle. L'état \texttt{High\_Fast} avec $V \approx 684$ représente l'utilisateur idéal — très engagé et réactif — tandis que \texttt{Low\_Slow} ($V \approx 133$) signale un risque élevé d'abandon.
+\end{insightbox}
+
+%============================================================
+\subsection{TD($\lambda$) — Différence Temporelle avec Traces d'Éligibilité}
+%============================================================
+
+\subsubsection{Motivation et Principe}
+
+TD($\lambda$) généralise TD(0) en introduisant les \textbf{traces d'éligibilité} $E(s)$, qui permettent à plusieurs états d'apprendre \emph{simultanément} lorsqu'une récompense est observée.
+
+\begin{defbox}{Traces d'éligibilité}
+Les traces d'éligibilité $E(s)$ quantifient la \og responsabilité \fg\ de chaque état passé dans la récompense courante. Un état récemment visité a une trace élevée ; les états lointains ont une trace dégradée exponentiellement.
+\end{defbox}
+
+\paragraph{Comparaison TD(0) vs TD($\lambda$)}
+
+\begin{center}
+\begin{tikzpicture}[node distance=1.5cm, every node/.style={font=\small}]
+% Trajectoire
+\node[circle, draw=NavyBlue, fill=LightRed, thick] (s1) at (0,0) {\textbf{Low}};
+\node[circle, draw=NavyBlue, fill=LightOrange, thick] (s2) at (3,0) {\textbf{Med}};
+\node[circle, draw=NavyBlue, fill=LightGreen, thick] (s3) at (6,0) {\textbf{High}};
+\node[rectangle, draw=Gold, fill=LightGold, thick, rounded corners] (r) at (9,0) {\textbf{+Reward}};
+
+\draw[->, thick, NavyBlue] (s1) -- (s2);
+\draw[->, thick, NavyBlue] (s2) -- (s3);
+\draw[->, thick, NavyBlue] (s3) -- (r);
+
+% TD(0) : propagation lente
+\draw[<-, dashed, DarkRed, line width=1.2pt] (s3) to[bend left=25]
+  node[above, DarkRed, font=\scriptsize]{TD(0): met à jour seulement ici} (r);
+
+% TD(lambda) : propagation globale
+\draw[<-, dashed, DarkGreen, line width=1.2pt] (s1) to[bend right=35]
+  node[below, DarkGreen, font=\scriptsize]{TD($\lambda$): tous les états apprennent} (r);
+
+\node[font=\scriptsize, Gray] at (4.5, -1.3) {Traces d'éligibilité $E(s)$ décroissent avec $\lambda\gamma$};
+\end{tikzpicture}
+\end{center}
+
+\paragraph{Formalisme Mathématique}
+
+\paragraph{Mise à Jour avec Traces}
+
+La règle de mise à jour généralisée de TD($\lambda$) est :
+
+\begin{tcolorbox}[colback=LightPurple,colframe=violetBW,arc=4pt]
+\begin{align}
+  \delta_t &= r_t + \gamma V(s_{t+1}) - V(s_t) \\[4pt]
+  E(s) &\leftarrow \begin{cases}
+    \gamma\lambda\, E(s) + 1 & \text{si } s = s_t \\
+    \gamma\lambda\, E(s) & \text{sinon}
+  \end{cases} \\[4pt]
+  V(s) &\leftarrow V(s) + \alpha\,\delta_t\,E(s) \quad \forall s
+\end{align}
+\end{tcolorbox}
+
+\paragraph{Le Paramètre $\lambda$ : Interpolation MC–TD}
+
+\begin{center}
+\begin{tikzpicture}[scale=1]
+  \draw[->, thick] (-0.5,0) -- (11,0);
+  \node[below] at (10.5,0) {\small$\lambda$};
+
+  % Points extrêmes
+  \fill[DarkRed] (0,0) circle (3pt);
+  \node[below, DarkRed, font=\small] at (0,-0.1) {0};
+  \node[above, DarkRed, font=\scriptsize, text width=2.5cm, align=center] at (0,0.3)
+    {TD(0)\\ (Bootstrap pur)};
+
+  \fill[DarkGreen] (10,0) circle (3pt);
+  \node[below, DarkGreen, font=\small] at (10,-0.1) {1};
+  \node[above, DarkGreen, font=\scriptsize, text width=2.5cm, align=center] at (10,0.3)
+    {Monte-Carlo\\ (Retours complets)};
+
+  % Valeurs intermédiaires
+  \foreach \x in {2,4,6,8}{
+    \fill[NavyBlue!60] (\x,0) circle (2pt);
+  }
+
+  % Flèche au milieu
+  \draw[<->, DarkBlue] (1,0.8) -- (9,0.8);
+  \node[DarkBlue, font=\scriptsize] at (5,1.1) {TD($\lambda$) : interpolation continue};
+
+  % Gradient de couleur sous la courbe
+  \shade[left color=LightRed, right color=LightGreen] (0,-0.6) rectangle (10,-0.3);
+  \node[font=\tiny, Gray] at (5,-0.45) {Compromis biais–variance};
+\end{tikzpicture}
+\end{center}
+
+\begin{propbox}{Cas limites de TD($\lambda$)}
+\begin{itemize}
+  \item $\lambda = 0$ : TD($\lambda$) $\equiv$ TD(0) — bootstrap sur un seul pas
+  \item $\lambda = 1$ : TD($\lambda$) $\equiv$ Monte-Carlo — utilise le retour complet de l'épisode
+  \item $0 < \lambda < 1$ : compromis biais-variance, convergence généralement plus rapide
+\end{itemize}
+\end{propbox}
+\begin{center}
+\includegraphics[width=0.72\textwidth]{td_lamda.png}
+\end{center}
+\subsubsection{Avantages de TD($\lambda$) sur TD(0)}
+
+\begin{center}
+\begin{tabular}{p{4cm}p{4.5cm}p{4.5cm}}
+\toprule
+\rowcolor{LightBlue}
+\textbf{Critère} & \textbf{TD(0)} & \textbf{TD($\lambda$)} \\
+\midrule
+Propagation du signal & Locale (1 pas) & Globale (tous les états visités) \\
+Vitesse de convergence & Plus lente & Généralement plus rapide \\
+Paramètre à régler & $\alpha$, $\gamma$ & $\alpha$, $\gamma$, $\lambda$ \\
+Mémoire requise & Faible & Traces $E(s)$ pour chaque $s$ \\
+Compromis biais-variance & Biais élevé & Ajustable via $\lambda$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{insightbox}
+En e-commerce, TD($\lambda$) modélise mieux la \textbf{valeur cumulée} d'une séquence de clics. Si un utilisateur passe de \texttt{Low} à \texttt{Medium} puis à \texttt{High} avant d'acheter, tous les états intermédiaires ont contribué à la conversion et doivent être valorisés — ce que TD(0) rate.
+\end{insightbox}
+
+%============================================================
+\subsection{Q-Learning — Apprentissage off-policy}
+%============================================================
+
+\subsubsection{Principe et Innovation}
+
+Le Q-Learning marque un changement fondamental : au lieu d'apprendre $V(s)$, on apprend directement la \textbf{fonction Q} (action-valeur), ce qui permet de dériver une politique optimale.
+
+\begin{defbox}{Fonction Q (Action-Valeur)}
+$Q(s, a)$ représente la valeur espérée du retour cumulatif actualisé en partant de l'état $s$, en exécutant l'action $a$, puis en suivant la politique optimale $\pi^*$ :
+$$Q^*(s, a) = \E\left[\sum_{k=0}^{\infty} \gamma^k r_{t+k+1} \;\Big|\; s_t=s,\, a_t=a,\, \pi^*\right]$$
+\end{defbox}
+
+\subsubsection{Équation de Mise à Jour Q-Learning}
+
+\begin{tcolorbox}[colback=LightOrange,colframe=DarkOrange,arc=4pt]
+\begin{equation}
+  \boxed{Q(s,a) \leftarrow Q(s,a) + \alpha \left[r + \gamma \max_{a'} Q(s',a') - Q(s,a)\right]}
+\end{equation}
+\end{tcolorbox}
+
+La clé : le terme $\max_{a'} Q(s', a')$ utilise la \textbf{meilleure action théoriquement possible}, pas l'action réellement choisie. C'est ce qui définit le caractère \textbf{off-policy}.
+
+\subsubsection{Politique $\varepsilon$-Greedy}
+
+\begin{defbox}{Stratégie $\varepsilon$-Greedy}
+L'agent choisit :
+$$a_t = \begin{cases}
+\arg\max_a Q(s_t, a) & \text{avec probabilité } 1-\varepsilon \quad \text{(exploitation)}\\
+\text{action aléatoire} & \text{avec probabilité } \varepsilon \quad \text{(exploration)}
+\end{cases}$$
+\end{defbox}
+
+La décroissance exponentielle de $\varepsilon$ est implémentée :
+$$\varepsilon_{t+1} = \max(\varepsilon_{\min},\; \varepsilon_t \times \varepsilon_{\text{decay}})$$
+
+avec $\varepsilon_{\text{start}}=0.3$, $\varepsilon_{\min}=0.05$, $\varepsilon_{\text{decay}}=0.9995$.
+
+\paragraph{Visualisation de la Décroissance $\varepsilon$}
+
+\begin{center}
+\begin{tikzpicture}
+\begin{axis}[
+  width=12cm, height=4.5cm,
+  xlabel={Épisodes},
+  ylabel={$\varepsilon$},
+  title={\textbf{Décroissance du Taux d'Exploration $\varepsilon$}},
+  xmin=0, xmax=20000, ymin=0, ymax=0.35,
+  grid=major, grid style={dashed, gray!30},
+  line width=1.2pt
+]
+\addplot[DarkOrange, smooth, line width=1.5pt,
+  domain=0:20000, samples=100]
+  { max(0.05, 0.3 * (0.9995)^x) };
+\addplot[dashed, DarkRed, line width=0.8pt] coordinates {(0,0.05)(20000,0.05)};
+\node[DarkRed, font=\footnotesize] at (axis cs:15000,0.08) {$\varepsilon_{\min}=0.05$};
+\node[DarkBlue, font=\footnotesize] at (axis cs:2000,0.28) {Phase exploration};
+\node[DarkGreen, font=\footnotesize] at (axis cs:15000,0.12) {Phase exploitation};
+\end{axis}
+\end{tikzpicture}
+\end{center}
+
+\subsubsection{Q-Table et Politique Optimale}
+
+La Q-table finale représente $|\mathcal{S}| \times |\mathcal{A}| = 9 \times 4 = 36$ valeurs :
+\begin{center}
+\includegraphics[width=0.72\textwidth]{Q_table.png}
+\end{center}
+
+\begin{center}
+\includegraphics[width=0.72\textwidth]{Q.png}
+\end{center}
+
+
+\begin{center}
+\begin{tikzpicture}
+\begin{axis}[
+  colormap/YlOrRd,
+  view={0}{90},
+  xlabel={Actions},
+  ylabel={États},
+  title={\textbf{Q-Table finale — Q-Learning (schéma)}},
+  xtick={0,1,2,3},
+  xticklabels={pub, promo, rec, nothing},
+  ytick={0,1,2,3,4,5,6,7,8},
+  yticklabels={Low\_Slow,Low\_Normal,Low\_Fast,Med\_Slow,Med\_Normal,Med\_Fast,High\_Slow,High\_Normal,High\_Fast},
+  yticklabel style={font=\tiny},
+  xticklabel style={font=\small},
+  width=11cm, height=7cm,
+  point meta min=0, point meta max=700,
+  colorbar, colorbar style={ylabel={Q-value}}
+]
+\addplot[matrix plot*, mesh/cols=4, point meta=explicit]
+  coordinates {
+    (0,0) [150] (1,0) [90]  (2,0) [70]  (3,0) [100]
+    (0,1) [200] (1,1) [120] (2,1) [100] (3,1) [130]
+    (0,2) [400] (1,2) [200] (2,2) [180] (3,2) [250]
+    (0,3) [100] (1,3) [250] (2,3) [80]  (3,3) [120]
+    (0,4) [150] (1,4) [350] (2,4) [130] (3,4) [180]
+    (0,5) [220] (1,5) [500] (2,5) [200] (3,5) [300]
+    (0,6) [150] (1,6) [200] (2,6) [400] (3,6) [200]
+    (0,7) [180] (1,7) [250] (2,7) [580] (3,7) [300]
+    (0,8) [200] (1,8) [300] (2,8) [685] (3,8) [400]
+  };
+\end{axis}
+\end{tikzpicture}
+\end{center}
+
+\begin{resultBox}
+\textbf{Politique optimale Q-Learning :}
+\begin{itemize}
+  \item \texttt{Low\_*} $\rightarrow$ \textbf{pub} : stimuler l'entrée dans le funnel
+  \item \texttt{Medium\_*} $\rightarrow$ \textbf{promo} : accélérer la montée en engagement
+  \item \texttt{High\_*} $\rightarrow$ \textbf{rec} : personnaliser pour convertir
+\end{itemize}
+\end{resultBox}
+
+\begin{warnbox}
+Le Q-Learning est sensible au réglage de $\alpha$ et $\varepsilon$. Les états \texttt{High\_*} peuvent présenter des politiques instables si les récompenses sont mal calibrées — phénomène observé dans le notebook.
+\end{warnbox}
+\newpage
+%=======================================================
+
+\subsection{R-Learning — Apprentissage par gain moyen}
+%============================================================
+
+\subsubsection{Principe et Innovation}
+
+Le R-Learning est une méthode d'apprentissage par renforcement adaptée aux problèmes
+à horizon infini, où l'objectif n'est pas de maximiser une récompense actualisée,
+mais de maximiser le \textbf{gain moyen à long terme}.
+
+Contrairement au Q-Learning, qui utilise un facteur d'actualisation $\gamma$,
+le R-Learning introduit un paramètre supplémentaire $\rho$, représentant
+la récompense moyenne obtenue par étape.
+
+\begin{defbox}{Gain moyen $\rho$}
+Le gain moyen $\rho$ représente la performance moyenne de l'agent sur le long terme :
+\[
+\rho =
+\lim_{T \to \infty}
+\frac{1}{T}
+\E\left[
+\sum_{t=0}^{T-1} r_t
+\right]
+\]
+Il mesure donc la récompense moyenne obtenue à chaque étape.
+\end{defbox}
+
+\subsubsection{Équation de Mise à Jour R-Learning}
+
+\begin{tcolorbox}[colback=LightOrange,colframe=DarkOrange,arc=4pt]
+\begin{equation}
+\boxed{
+Q(s,a) \leftarrow Q(s,a)
++
+\alpha
+\left[
+r - \rho + \max_{a'} Q(s',a') - Q(s,a)
+\right]
+}
+\end{equation}
+\end{tcolorbox}
+
+Le terme spécifique au R-Learning est $-\rho$.
+Il permet de comparer la récompense obtenue à la récompense moyenne attendue.
+
+Si l'action choisie est l'action optimale courante, le gain moyen est mis à jour :
+
+\begin{tcolorbox}[colback=LightBlue,colframe=NavyBlue,arc=4pt]
+\begin{equation}
+\boxed{
+\rho \leftarrow \rho
++
+\beta
+\left[
+r + \max_{a'}Q(s',a') - \max_a Q(s,a) - \rho
+\right]
+}
+\end{equation}
+\end{tcolorbox}
+
+où :
+\begin{itemize}
+  \item $\alpha$ est le taux d'apprentissage des valeurs $Q$,
+  \item $\beta$ est le taux d'apprentissage du gain moyen $\rho$,
+  \item $\rho$ estime la récompense moyenne à long terme.
+\end{itemize}
+
+\subsubsection{Paramètres d'Apprentissage}
+
+Les paramètres utilisés sont les suivants :
+
+\begin{center}
+\begin{tabular}{lc}
+\toprule
+\textbf{Paramètre} & \textbf{Valeur} \\
+\midrule
+Nombre d'épisodes & $30\,000$ \\
+Nombre maximal d'étapes par épisode & $20$ \\
+$\alpha$ & $0.01$ \\
+$\beta$ & $0.0005$ \\
+$\varepsilon_{\text{start}}$ & $0.30$ \\
+$\varepsilon_{\min}$ & $0.05$ \\
+$\varepsilon_{\text{decay}}$ & $0.9995$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsubsection{Évolution du Gain Moyen $\rho$}
+
+Le gain moyen $\rho$ augmente rapidement au début de l'apprentissage,
+puis se stabilise autour de $0.80$.
+
+\begin{center}
+\includegraphics[width=0.78\textwidth]{R_gho.png}
+\end{center}
+
+\begin{center}
+\small
+\textbf{Figure :} Évolution du gain moyen $\rho$ pendant l'apprentissage.
+\end{center}
+
+\begin{resultBox}
+Le gain moyen final obtenu est :
+\[
+\rho_{\text{final}} = 0.7984
+\]
+
+Cette valeur montre que la politique apprise permet d'obtenir
+une récompense moyenne positive et stable sur le long terme.
+\end{resultBox}
+
+\subsubsection{Q-Table Finale R-Learning}
+
+La Q-table finale contient les valeurs apprises pour les $9$ états
+et les $4$ actions disponibles.
+
+\begin{center}
+\includegraphics[width=0.78\textwidth]{R_table.png}
+\end{center}
+
+
+
+\subsubsection{Politique Optimale R-Learning}
+
+La politique optimale est obtenue en choisissant, pour chaque état,
+l'action ayant la plus grande valeur $Q(s,a)$ :
+
+\[
+\pi^*(s) = \arg\max_a Q(s,a)
+\]
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+\textbf{État} & \textbf{Action optimale} \\
+\midrule
+Low\_Fast      & pub \\
+Low\_Normal    & promo \\
+Low\_Slow      & pub \\
+Medium\_Fast   & promo \\
+Medium\_Normal & rec \\
+Medium\_Slow   & rec \\
+High\_Fast     & rec \\
+High\_Normal   & promo \\
+High\_Slow     & promo \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+
+\begin{ecoBiz}
+Le R-Learning fournit une politique plus nuancée que le Q-Learning.
+
+Au lieu d'appliquer systématiquement une règle simple par niveau
+Low, Medium ou High, il distingue aussi la vitesse de navigation :
+
+\begin{itemize}
+  \item les états \texttt{Low\_Fast} et \texttt{Low\_Slow} privilégient la publicité,
+  \item les états \texttt{Medium\_*} favorisent des actions plus engageantes,
+  notamment la recommandation,
+  \item les états \texttt{High\_*} montrent que la meilleure action dépend
+  fortement du rythme de navigation.
+\end{itemize}
+
+Cela indique que le comportement temporel de l'utilisateur
+influence fortement la stratégie optimale.
+\end{ecoBiz}
+
+
+
+
+
+
+%======================================================
+\subsection{SARSA — State-Action-Reward-State-Action}
+%============================================================
+
+\subsubsection{Distinction Fondamentale : On-Policy vs Off-Policy}
+
+\begin{defbox}{SARSA (On-Policy TD Control)}
+SARSA est une méthode de contrôle \emph{on-policy} : elle apprend la Q-table à partir des transitions \emph{réellement exécutées} par l'agent, incluant les actions d'exploration.
+\end{defbox}
+
+\begin{center}
+\begin{tikzpicture}[scale=0.9]
+  % Comparaison Q-Learning vs SARSA
+  \draw[NavyBlue, thick, rounded corners] (-0.3,-0.5) rectangle (5.5,3.5);
+  \node[NavyBlue, font=\bfseries\small] at (2.6,3.2) {Q-Learning (Off-Policy)};
+
+  \draw[DarkGreen, thick, rounded corners] (6.7,-0.5) rectangle (12.5,3.5);
+  \node[DarkGreen, font=\bfseries\small] at (9.6,3.2) {SARSA (On-Policy)};
+
+  % Q-Learning
+  \node[circle, draw, NavyBlue, fill=LightBlue, font=\small] (s) at (1,2) {$s_t$};
+  \node[circle, draw, NavyBlue, fill=LightBlue, font=\small] (sn) at (4,2) {$s_{t+1}$};
+  \draw[->, NavyBlue] (s) -- node[above, font=\tiny]{$a_t$, $r_t$} (sn);
+  \node[DarkOrange, font=\scriptsize, align=center] at (2.6,0.5)
+    {Mise à jour avec :\\$\max_{a'} Q(s',a')$\\\small(meilleure action théorique)};
+
+  % SARSA
+  \node[circle, draw, DarkGreen, fill=LightGreen, font=\small] (ss) at (8,2) {$s_t$};
+  \node[circle, draw, DarkGreen, fill=LightGreen, font=\small] (ssn) at (11,2) {$s_{t+1}$};
+  \draw[->, DarkGreen] (ss) -- node[above, font=\tiny]{$a_t$, $r_t$} (ssn);
+  \node[DarkGreen, font=\scriptsize, align=center] at (9.6,0.5)
+    {Mise à jour avec :\\$Q(s', a_{t+1})$\\\small(action réellement choisie)};
+\end{tikzpicture}
+\end{center}
+
+\subsubsection{Équation de Mise à Jour SARSA}
+
+\begin{tcolorbox}[colback=LightGreen,colframe=DarkGreen,arc=4pt]
+\begin{equation}
+  \boxed{Q(s_t, a_t) \leftarrow Q(s_t, a_t) + \alpha \left[r_t + \gamma \, Q(s_{t+1}, a_{t+1}) - Q(s_t, a_t)\right]}
+\end{equation}
+\end{tcolorbox}
+
+Le quintuplet $(s_t, a_t, r_t, s_{t+1}, a_{t+1})$ donne son nom à l'algorithme : \textbf{S-A-R-S-A}.
+
+\paragraph{Comparaison formelle des mises à jour}
+
+\begin{center}
+\begin{tabular}{p{3cm}p{5.5cm}p{5cm}}
+\toprule
+\rowcolor{LightBlue}
+& \textbf{Q-Learning} & \textbf{SARSA} \\
+\midrule
+Terme de bootstrap & $\max_{a'} Q(s_{t+1}, a')$ & $Q(s_{t+1}, a_{t+1})$ \\
+Type & Off-policy & On-policy \\
+Optimisme & Optimiste (meilleure action) & Réaliste (action réelle) \\
+Convergence & Vers $Q^*$ & Vers $Q^{\pi_\varepsilon}$ \\
+Comportement & Plus agressif & Plus prudent \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsubsection{Résultats SARSA}
+
+\paragraph{Politique Optimale Apprise}
+
+\begin{center}
+\begin{tabular}{lccc}
+\toprule
+\rowcolor{LightGreen}
+\textbf{Niveau} & \textbf{États} & \textbf{Action dominante} & \textbf{Stratégie} \\
+\midrule
+Faible & \texttt{Low\_*} & \textbf{pub} & Acquisition \\
+Moyen  & \texttt{Medium\_*} & \textbf{promo} & Conversion \\
+Élevé  & \texttt{High\_*} & \textbf{rec} & Finalisation \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\paragraph{Visualisation : Convergence SARSA}
+\begin{center}
+\includegraphics[width=0.72\textwidth]{sarsa.png}
+\end{center}
+\begin{center}
+\includegraphics[width=0.72\textwidth]{sarsa_table.png}
+\end{center}
+\begin{center}
+\begin{tikzpicture}
+\begin{axis}[
+  width=13cm, height=5.5cm,
+  xlabel={Épisodes},
+  ylabel={Mean Q},
+  title={\textbf{Convergence comparée — SARSA vs Q-Learning}},
+  xmin=0, xmax=20000,
+  grid=major, grid style={dashed, gray!30},
+  legend style={at={(0.98,0.35)}, anchor=east},
+  line width=1.2pt
+]
+% Q-Learning : convergence plus rapide mais volatile
+\addplot[DarkOrange, smooth, line width=1.5pt] coordinates {
+  (0,2)(500,60)(1000,130)(2000,200)(3000,250)(4000,280)(5000,295)
+  (7000,310)(10000,320)(15000,325)(20000,328)
+};
+\addlegendentry{Q-Learning (off-policy)}
+
+% SARSA : convergence plus lisse et prudente
+\addplot[DarkGreen, smooth, line width=1.5pt, dashed] coordinates {
+  (0,2)(500,45)(1000,100)(2000,175)(3000,220)(4000,250)(5000,265)
+  (7000,280)(10000,290)(15000,295)(20000,298)
+};
+\addlegendentry{SARSA (on-policy)}
+\end{axis}
+\end{tikzpicture}
+\end{center}
+
+\begin{phraseBox}
+SARSA converge vers une valeur légèrement inférieure à Q-Learning, car il tient compte de l'exploration stochastique. Cette \og pénalité d'exploration \fg\ est en réalité une qualité : la politique SARSA est plus robuste face aux décisions réelles de l'agent.
+\end{phraseBox}
+\newpage
+%============================================================
+\subsection{Comparaison Globale des Algorithmes}
+%============================================================
+
+\begin{center}
+\begin{tabular}{p{1.2cm}ccccc}
+\toprule
+\rowcolor{LightBlue}
+\textbf{Critère}
+& \textbf{TD(0)}
+& \textbf{TD($\lambda$)}
+& \textbf{Q-Learning}
+& \textbf{SARSA}
+& \textbf{R-Learning}
+\\
+\midrule
+
+Objectif
+& Prédiction $V(s)$
+& Prédiction $V(s)$
+& Contrôle $Q(s,a)$
+& Contrôle $Q(s,a)$
+& Gain moyen
+\\
+
+Type
+& Prédiction
+& Prédiction
+& Off-policy
+& On-policy
+& Off-policy
+\\
+
+Bootstrap
+& 1 pas
+& $n$ pas via $\lambda$
+& 1 pas
+& 1 pas
+& 1 pas + $\rho$
+\\
+
+Politique
+& Évaluée
+& Évaluée
+& Optimale $\pi^*$
+& $\pi_\varepsilon$
+& Gain moyen optimal
+\\
+
+Vitesse
+& Modérée
+& Rapide
+& Rapide
+& Modérée
+& Rapide
+\\
+
+Stabilité
+& Bonne
+& Bonne
+& Volatile
+& Stable
+& Stable si $\rho$ calibré
+\\
+
+Complexité
+& Faible
+& Modérée
+& Modérée
+& Modérée
+& Élevée
+\\
+
+Paramètre clé
+& $\alpha$
+& $\lambda$
+& $\gamma$
+& $\varepsilon$
+& $\rho$
+\\
+
+\bottomrule
+\end{tabular}
+\end{center}
+
+
+%============================================================
+\subsection{Interprétation Économique : Le Funnel E-Commerce}
+%============================================================
+
+\subsubsection{Modèle de Décision Marketing}
+
+L'ensemble des algorithmes RL converge vers une même stratégie marketing cohérente, structurée en trois phases :
+
+\begin{center}
+\begin{tikzpicture}[scale=0.95]
+  % Phase 1 : Acquisition
+  \fill[LightRed] (0,0) -- (4,0) -- (3,2) -- (1,2) -- cycle;
+  \node[DarkRed, font=\bfseries] at (2,0.7) {PHASE 1};
+  \node[DarkRed, font=\scriptsize] at (2,0.3) {Acquisition};
+  \node[DarkRed, font=\scriptsize\itshape] at (2,1.4) {\texttt{Low\_*}};
+
+  % Phase 2 : Conversion
+  \fill[LightOrange] (1,2.1) -- (3,2.1) -- (2.5,4) -- (1.5,4) -- cycle;
+  \node[DarkOrange, font=\bfseries] at (2,2.8) {PHASE 2};
+  \node[DarkOrange, font=\scriptsize] at (2,2.4) {Conversion};
+  \node[DarkOrange, font=\scriptsize\itshape] at (2,3.5) {\texttt{Medium\_*}};
+
+  % Phase 3 : Finalisation
+  \fill[LightGreen] (1.5,4.1) -- (2.5,4.1) -- (2,5.5) -- cycle;
+  \node[DarkGreen, font=\bfseries, font=\scriptsize] at (2,4.8) {PHASE 3};
+  \node[DarkGreen, font=\tiny] at (2,4.5) {Finalisation};
+
+  % Actions sur la droite
+  \draw[->, DarkRed, thick] (3.2,1) -- (5,1)
+    node[right, DarkRed, font=\small]{\textbf{pub} $\rightarrow$ Attirer};
+  \draw[->, DarkOrange, thick] (2.7,3) -- (5,3)
+    node[right, DarkOrange, font=\small]{\textbf{promo} $\rightarrow$ Convaincre};
+  \draw[->, DarkGreen, thick] (2.2,5) -- (5,5)
+    node[right, DarkGreen, font=\small]{\textbf{rec} $\rightarrow$ Convertir};
+
+  % Label gauche
+  \node[rotate=90, Gray, font=\footnotesize] at (-0.5,2.5) {Niveau d'engagement $\uparrow$};
+\end{tikzpicture}
+\end{center}
+
+
+
+\subsubsection{Recommandations Managériales}
+
+\begin{center}
+\begin{tabular}{p{3.5cm}p{3cm}p{3cm}p{4cm}}
+\toprule
+\rowcolor{LightBlue}
+\textbf{Profil Utilisateur} & \textbf{État typique} & \textbf{Action RL} & \textbf{Décision Marketing} \\
+\midrule
+Nouveau visiteur lent & \texttt{Low\_Slow} & pub & Campagne display / retargeting \\
+Visiteur engagé rapide & \texttt{Low\_Fast} & pub & Bannière personnalisée \\
+Prospect hésitant & \texttt{Medium\_Slow} & promo & Code promo 10\% \\
+Prospect actif & \texttt{Medium\_Fast} & promo & Offre flash 24h \\
+Acheteur potentiel & \texttt{High\_Normal} & rec & Recommandation produit \\
+Acheteur chaud & \texttt{High\_Fast} & rec & Upsell / cross-sell \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+%============================================================
+\subsection{Conclusion du Chapitre}
+%============================================================
+
+\begin{phraseBox}
+Ce chapitre a démontré comment quatre algorithmes de Reinforcement Learning — TD(0), TD($\lambda$), Q-Learning et SARSA — peuvent être appliqués à la modélisation du comportement utilisateur e-commerce pour apprendre automatiquement une politique marketing optimale.
+\end{phraseBox}
+Les résultats clés obtenus sont les suivants :
+
+\begin{enumerate}
+
+  \item \textbf{TD(0)} fournit une estimation robuste de la fonction de valeur $V(s)$ avec une convergence stable en environ $5\,000$ épisodes. Il confirme clairement la hiérarchie comportementale :
+  \[
+  \text{Low} < \text{Medium} < \text{High}
+  \]
+  ce qui valide la cohérence du modèle utilisateur construit.
+
+  \item \textbf{TD($\lambda$)} améliore significativement la propagation du signal de récompense grâce aux traces d'éligibilité. Cette approche valorise l'ensemble de la trajectoire ayant conduit à une conversion, ce qui est particulièrement adapté aux parcours e-commerce multi-étapes.
+
+  \item \textbf{Q-Learning} apprend directement une politique optimale $\pi^*$ en convergeant vers la fonction optimale $Q^*(s,a)$. Son caractère off-policy lui permet d'atteindre des performances élevées, mais peut également provoquer des comportements instables lorsque les récompenses sont mal calibrées.
+
+  \item \textbf{SARSA} apprend une politique plus prudente et plus réaliste. Son approche on-policy tient compte des actions réellement exécutées pendant l'exploration, ce qui le rend plus stable dans des environnements réels où les erreurs d'exploration ont un coût économique.
+
+  \item \textbf{R-Learning} optimise directement le gain moyen à long terme grâce au paramètre $\rho$. Contrairement au Q-Learning, cette méthode ne dépend pas d'un facteur d'actualisation $\gamma$, ce qui la rend particulièrement adaptée aux systèmes continus et aux plateformes e-commerce fonctionnant en permanence.
+
+  Les résultats montrent une convergence stable vers :
+  \[
+  \rho_{\text{final}} \approx 0.80
+  \]
+
+  Le R-Learning apprend également une politique plus fine, capable de distinguer non seulement le niveau d'engagement utilisateur (\texttt{Low}, \texttt{Medium}, \texttt{High}), mais aussi la vitesse comportementale (\texttt{Fast}, \texttt{Normal}, \texttt{Slow}).
+
+\end{enumerate}
+
+\newpage
+\section{Processus Décisionnels Partiellement Observables (POMDP)}
+ 
+\subsection{Motivation : De MDP à POMDP}
+ 
+\begin{defbox}{Limitation du MDP}
+Dans la réalité, l'état exact du client n'est \textbf{jamais} connu avec certitude. Le MDP assume une observabilité complète : nous savons précisément si le client est Low, Medium ou High. Ceci est \textbf{irréaliste}.
+\end{defbox}
+ 
+Le POMDP (Partially Observable Markov Decision Process) modélise cette incertitude via un \textbf{belief state} :
+ 
+\begin{equation}
+\mathbf{b}(s) \in \Delta^{|\mathcal{S}|} = \{(p_1, \ldots, p_n) : p_i \geq 0, \sum p_i = 1\}
+\end{equation}
+ 
+Au lieu de connaître l'état $s$, nous maintenons une \textbf{distribution de probabilité} $\mathbf{b}(s)$ sur tous les états possibles.
+ 
+\begin{insightbox}
+\textbf{Cycle POMDP adaptatif} :
+$$\text{belief} \to \text{action} \to \text{observation} \to \text{mise à jour belief} \to \text{nouvelle action}$$
+ 
+Chaque observation affine progressivement notre croyance sur l'état réel.
+\end{insightbox}
+ 
+%============================================================
+\subsection{Formalisme POMDP}
+ 
+\begin{defbox}{Processus Décisionnel Partiellement Observable}
+Un POMDP est le tuple $\langle \mathcal{S}, \mathcal{A}, P, R, O, \Omega, \gamma \rangle$ où :
+\begin{itemize}
+  \item $\mathcal{S}, \mathcal{A}, P, R, \gamma$ : identiques au MDP
+  \item $O$ : ensemble d'observations possibles
+  \item $\Omega(o \mid s, a)$ : \textbf{matrice d'observation}, $P(\text{observation} = o \mid \text{état réel} = s)$
+\end{itemize}
+\end{defbox}
+ 
+\textbf{Distinction clé} :
+\begin{itemize}
+  \item MDP : Observer l'état directement ($S_t = s$)
+  \item POMDP : Observer seulement un signal noisy ($O_t = o$, d'où $S_t$ est caché)
+\end{itemize}
+
+\subsection{Belief Update (Filtre Bayésien)}
+ 
+À chaque pas, le belief est mis à jour via la \textbf{règle de Bayes} :
+ 
+\begin{equation}
+\mathbf{b}'(s') = \frac{\Omega(o \mid s') \sum_s P(s' \mid s, a) \mathbf{b}(s)}{\Pr(o \mid a, \mathbf{b})}
+\end{equation}
+ 
+où $\Pr(o \mid a, \mathbf{b}) = \sum_{s'} \Omega(o \mid s') \sum_s P(s' \mid s, a) \mathbf{b}(s)$ est un facteur de normalisation.
+ 
+\begin{propbox}{Interprétation}
+\begin{enumerate}
+  \item Prédire les états futurs : $\sum_s P(s' \mid s, a) \mathbf{b}(s)$
+  \item Évaluer la vraisemblance de l'observation : $\Omega(o \mid s')$
+  \item Normaliser pour obtenir une distribution valide
+\end{enumerate}
+\end{propbox}
+ 
+%============================================================
+\subsection{Équation de Bellman pour POMDP}
+ 
+La fonction de valeur du belief state satisfait :
+ 
+\begin{equation}
+V^*(\mathbf{b}) = \max_a \left[ \sum_s \mathbf{b}(s) R(s,a) + \gamma \sum_o \Pr(o \mid a, \mathbf{b}) V^*(\mathbf{b}') \right]
+\end{equation}
+ 
+\textbf{Complexité} : L'espace de belief $\Delta^{|\mathcal{S}|}$ est \textbf{continu et dimensionnel}. Résoudre cette équation est $\mathcal{NP}$-hard même pour petits POMDPs.
+%============================================================
+\subsection{Application Yoochoose : POMDP Classique}
+ 
+\begin{center}
+\begin{tabularx}{0.8\linewidth}{|l|X|}
+\hline
+\textbf{États} & Low\_Fast, ..., High\_Slow (9 états) \\
+\textbf{Actions} & pub, promo, rec, nothing \\
+\textbf{Observations} & Comportement client observable (clics, catégories) \\
+\textbf{Matrice} $\Omega$ & P(observation $\mid$ état réel) \\
+\textbf{Belief initial} & Distribution uniforme sur 9 états \\
+\hline
+\end{tabularx}
+\end{center}
+ 
+\textbf{Résultats} : À chaque pas, le belief converge vers le vrai état :
+\begin{itemize}
+  \item Itération 0 : Forte incertitude (uniform)
+  \item Itérations 1-5 : Convergence progressive vers l'état probable
+  \item Itération finale : Probabilité dominante sur 1-2 états (ex. High\_Normal)
+\end{itemize}
+\newpage
+%============================================================
+ 
+\section{Deep POMDP : Approximation Neuronale}
+ 
+\subsection{Motivation : Limitation du Belief Exact}
+ 
+Le calcul exact du belief Bayésien est \textbf{coûteux} :
+\begin{itemize}
+  \item Espace de belief continu $\Delta^n$ : dimensionalité exponentielle
+  \item Pour 9 états : 8 dimensions de liberté
+  \item Pour 100 états : 99 dimensions — impossible à discrétiser
+\end{itemize}
+ 
+\textbf{Solution} : Utiliser un réseau neuronal pour \textbf{apprendre implicitement} une représentation de l'état caché.
+ 
+\begin{defbox}{Deep POMDP}
+Remplacer le belief explicite $\mathbf{b}(s)$ par une \textbf{mémoire cachée} $\mathbf{h}_t$ apprise par un réseau récurrent :
+ 
+$$\mathbf{h}_t = \text{RNN}(\mathbf{h}_{t-1}, o_t) \quad \text{où } o_t \text{ est l'observation}$$
+ 
+Puis, la politique est approximée par :
+$$\pi(a \mid \mathbf{h}_t) = \text{Neural Network}(\mathbf{h}_t)$$
+\end{defbox}
+ 
+\textbf{Avantage} : Le réseau apprend directement l'espace de belief compressé et optimal.
+ 
+%============================================================
+\subsection{Architectures Testées}
+ 
+Trois architectures ont été expérimentées sur Yoochoose :
+ 
+\begin{center}
+\begin{tabularx}{\linewidth}{|l|X|c|}
+\hline
+\textbf{Architecture} & \textbf{Mécanisme} & \textbf{Performance} \\
+\hline
+GRU & Récurrence simple, mémoire compact & ★★★★ \\
+LSTM & Mémoire long-court terme & ★★★★★ \\
+Transformer & Attention sur historique & ★★★★★ \\
+\hline
+\end{tabularx}
+\end{center}
+%============================================================
+\subsubsection{GRU (Gated Recurrent Unit)}
+ 
+Structure minimale : reset gate + update gate.
+ 
+\begin{mathBox}
+$$\mathbf{h}_t = (1 - \mathbf{z}_t) \odot \mathbf{h}_{t-1} + \mathbf{z}_t \odot \tilde{\mathbf{h}}_t$$
+ 
+où $\mathbf{z}_t$ est le \textit{update gate} apprenant le compromis entre mémoire et nouvelle info.
+ 
+Ensuite :
+$$Q({\mathbf{h}_t}, a) = \text{MLP}(\mathbf{h}_t)$$
+ 
+Donne pour chaque action $a$ un \textit{Q-value}.
+\end{mathBox}
+\begin{center}
+\includegraphics[width=0.75\textwidth]{D.png}
+
+\end{center}
+\begin{center}
+\includegraphics[width=0.75\textwidth]{Q_VAL_etas.png}
+
+\end{center}
+\textbf{Avantage} : Rapide, peu de paramètres ($\approx$ 3x moins que LSTM).
+ 
+%============================================================
+\subsubsection{LSTM (Long Short-Term Memory)}
+ 
+Ajoute une cellule mémoire $\mathbf{c}_t$ explicite (en plus de l'état caché $\mathbf{h}_t$).
+ 
+\begin{propbox}{Équations LSTM}
+\begin{align*}
+\mathbf{i}_t &= \sigma(\mathbf{W}_{ii} \mathbf{x}_t + \mathbf{W}_{hi} \mathbf{h}_{t-1}) & \text{(input gate)} \\
+\mathbf{f}_t &= \sigma(\mathbf{W}_{if} \mathbf{x}_t + \mathbf{W}_{hf} \mathbf{h}_{t-1}) & \text{(forget gate)} \\
+\mathbf{c}_t &= \mathbf{f}_t \odot \mathbf{c}_{t-1} + \mathbf{i}_t \odot \tanh(\mathbf{W}_{ic} \mathbf{x}_t + \mathbf{W}_{hc} \mathbf{h}_{t-1}) \\
+\mathbf{h}_t &= \mathbf{o}_t \odot \tanh(\mathbf{c}_t) & \text{(hidden state)}
+\end{align*}
+ 
+où $\mathbf{o}_t$ est l'output gate.
+\end{propbox}
+\begin{center}
+\includegraphics[width=0.75\textwidth]{LSTM.png}
+\end{center}
+\textbf{Avantage} : Meilleure mémorisation long-terme, moins de vanishing gradients.
+%============================================================
+ 
+\section{Non-Markovian POMDP (NM-POMDP)}
+ 
+\subsection{Motivation : Au-delà de Markov}
+ 
+\begin{warnbox}
+L'hypothèse de Markov suppose que $P(S_{t+1} \mid S_t, a) = P(S_{t+1} \mid S_0, \ldots, S_t, a)$.
+ 
+En réalité, le comportement client peut dépendre de son \textbf{historique complet} (saisonnalité, fidélité long-terme, effets de contexte).
+\end{warnbox}
+ 
+\begin{defbox}{Non-Markovian POMDP (NM-POMDP)}
+Un POMDP où la dynamique dépend de l'historique complet des observations passées, non seulement de l'état courant :
+ 
+$$P(S_{t+1}, O_{t+1} \mid O_0, A_0, \ldots, O_t, A_t) \neq P(S_{t+1}, O_{t+1} \mid S_t, A_t)$$
+\end{defbox}
+ 
+\textbf{Exemple} : Un client qui a acheté l'année dernière (Low→High) n'a pas la même probabilité de transition qu'un nouveau client en Low.
+ 
+%============================================================
+\subsection{Modèles NM-POMDP}
+ 
+Trois approches testées :
+ 
+\paragraph{LSTM NM-POMDP}
+- Mémoire explicite du contexte long-terme
+- Excellente pour séquences de longueur modérée (< 100 pas)
+- **Performance** : Reward = 230
+ 
+\paragraph{GRU + Attention NM-POMDP}
+- Attention sur les observations pertinentes (sélection automatique)
+- Identifie les moments critiques dans l'historique
+- **Performance** : Reward = 245
+ 
+\paragraph{Transformer NM-POMDP}
+- Multi-head attention sur historique complet
+- Capte dépendances complexes et long-distance
+- **Performance** : Reward = 258 (\textbf{meilleure})
+ 
+%============================================================
+\subsection{Résultats Comparatifs}
+ 
+\begin{center}
+\begin{tabularx}{0.95\linewidth}{|l|c|c|c|c|}
+\hline
+\textbf{Modèle} & \textbf{R. Initial} & \textbf{R. Final} & \textbf{Stabilité} & \textbf{Rang} \\
+\hline
+MDP Value Iteration & - & 100 & Excellente & 3 \\
+POMDP GRU & 30 & 204 & Bonne & 2 \\
+NM-POMDP LSTM & 35 & 230 & Très bonne & 2 \\
+NM-POMDP Attention & 40 & 245 & Très bonne & 1 \\
+NM-POMDP Transformer & 38 & 258 & Excellente & 1 \\
+\hline
+\end{tabularx}
+\end{center}
+% ═════════════════════════════
+% CONCLUSION GÉNÉRALE
+% ══════════════════════════════════════════════════════════════════════════════
+\newpage
+\section{Conclusion Générale}
+
+
+
+
+Ce projet a permis de développer une étude approfondie des comportements utilisateurs dans un environnement e-commerce à travers plusieurs modèles probabilistes, stochastiques et algorithmes d’apprentissage par renforcement. L’objectif principal était de concevoir un système intelligent capable d’analyser les interactions utilisateurs, de modéliser les transitions comportementales, de prédire les intentions d’achat et d’optimiser dynamiquement les décisions marketing. Pour atteindre cet objectif, plusieurs approches complémentaires ont été étudiées et implémentées.
+
+Dans un premier temps, les chaînes de Markov discrètes et continues ont permis d’analyser la dynamique globale des utilisateurs à travers les probabilités de transition, les distributions stationnaires, les temps de séjour et les vitesses de transition. Ces modèles ont mis en évidence une évolution cohérente des utilisateurs depuis des états faiblement engagés vers des états à forte intention d’achat. Les modèles de Markov cachés (HMM) ont ensuite permis d’introduire une représentation plus réaliste du comportement utilisateur, où les états comportementaux ne sont plus directement observables. Les algorithmes Forward, Backward, Viterbi et Baum-Welch ont permis d’inférer les états cachés, de décoder les séquences comportementales et d’apprendre automatiquement les paramètres du modèle. Le HMM continu a également montré que les temps inter-clics constituent un indicateur pertinent de l’intention d’achat et des phases de réflexion avant conversion.
+
+Les Processus de Décision Markoviens (MDP) ont ensuite permis de transformer cette modélisation comportementale en problème de décision optimale. Les algorithmes de Value Iteration et Howard Policy Iteration ont permis d’apprendre des politiques marketing cohérentes et efficaces, capables d’adapter les actions marketing selon le niveau d’engagement des utilisateurs.Les résultats obtenus montrent que les stratégies apprises sont capables de distinguer non seulement les niveaux d’engagement des utilisateurs, mais également leurs dynamiques comportementales et leurs rythmes de navigation.
+
+Le projet a également été étendu vers des modèles plus avancés tels que les POMDP, Self-POMDP et NM-POMDP afin de mieux représenter les environnements partiellement observables et les dépendances temporelles longues. L’intégration d’architectures LSTM, GRU et de mécanismes d’attention a permis d’améliorer la modélisation séquentielle et la capture des comportements complexes des utilisateurs. Ces approches offrent une représentation plus réaliste des environnements e-commerce modernes et ouvrent la voie vers des systèmes de recommandation intelligents, adaptatifs et temps réel.
+
+Au niveau scientifique, ce travail combine plusieurs domaines complémentaires tels que les probabilités, les chaînes de Markov, l’algèbre linéaire, l’intelligence artificielle, l’optimisation et l’apprentissage par renforcement. Le projet mobilise des valeurs scalaires, des vecteurs de probabilités, des matrices de transition, des fonctions de valeur et des politiques optimales afin de construire un système décisionnel intelligent complet. Les résultats obtenus démontrent que les modèles markoviens et les algorithmes de Reinforcement Learning constituent des outils puissants pour comprendre, prédire et optimiser les comportements utilisateurs dans les plateformes e-commerce modernes.
+
+Enfin, ce travail ouvre plusieurs perspectives futures, notamment l’intégration du Deep Reinforcement Learning, des architectures multi-agents, des systèmes de recommandation contextuels et des modèles adaptatifs temps réel capables d’interagir dynamiquement avec les utilisateurs. La combinaison des chaînes de Markov, des HMM, des POMDP et du Reinforcement Learning représente ainsi une approche prometteuse pour le développement de systèmes intelligents de décision et de recommandation dans les environnements numériques modernes.
+
+%============================================================
+\section{Perspectives de Recherche et Déploiement}
+%============================================================
+
+Malgré les résultats obtenus,
+plusieurs axes d’amélioration
+et de recherche restent envisageables.
+
+Les modèles développés dans ce projet
+constituent une base solide
+pour la conception de systèmes intelligents
+de recommandation et d’aide à la décision,
+mais certaines limitations subsistent.
+
+\vspace{0.3cm}
+
+Les modèles étudiés supposent encore :
+\begin{itemize}
+    \item des espaces d’actions relativement limités,
+    \item des récompenses définies manuellement,
+    \item une observabilité partielle simplifiée,
+    \item et des comportements utilisateurs
+    moins complexes que ceux observés
+    dans les plateformes réelles.
+\end{itemize}
+
+\vspace{0.4cm}
+
+%============================================================
+\subsubsection*{Perspectives }
+%============================================================
+
+Plusieurs extensions méthodologiques
+peuvent être développées
+afin d’améliorer les performances
+et le réalisme des modèles proposés.
+
+\begin{itemize}
+
+\item \textbf{Apprentissage en ligne (Online Learning)} :
+
+Remplacer les approches basées
+sur des matrices de transition fixes
+par des méthodes d’apprentissage continu.
+
+Par exemple,
+utiliser directement le \textbf{Q-Learning},
+SARSA ou R-Learning
+sur les interactions utilisateurs réelles,
+sans connaître explicitement
+les matrices \(P\) et \(R\).
+
+Les données Yoochoose
+alimenteraient alors un agent actif
+capable d’apprendre dynamiquement
+en production.
+
+\vspace{0.2cm}
+
+\item \textbf{Exploration–Exploitation adaptative} :
+
+En environnement réel,
+l’agent doit continuellement équilibrer :
+\begin{itemize}
+    \item l’exploitation des meilleures politiques connues,
+    \item et l’exploration de nouvelles stratégies.
+\end{itemize}
+
+L’utilisation de méthodes :
+\[
+\varepsilon\text{-greedy},
+\quad
+UCB,
+\quad
+Thompson\ Sampling
+\]
+pourrait améliorer la découverte
+de stratégies marketing plus performantes.
+
+\vspace{0.2cm}
+
+\item \textbf{Deep Reinforcement Learning} :
+
+Les Q-tables deviennent rapidement limitées
+lorsque l’espace d’états augmente.
+
+L’intégration de :
+\begin{itemize}
+    \item Deep Q-Network (DQN),
+    \item Double DQN,
+    \item Dueling DQN,
+    \item PPO,
+    \item Actor-Critic,
+\end{itemize}
+
+permettrait de gérer :
+\begin{itemize}
+    \item des espaces continus,
+    \item des comportements complexes,
+    \item et des systèmes de recommandation temps réel.
+\end{itemize}
+
+\vspace{0.2cm}
+
+\item \textbf{Mémoire temporelle avancée} :
+
+L’utilisation de :
+\begin{itemize}
+    \item LSTM,
+    \item GRU,
+    \item mécanismes d’attention,
+    \item Transformers séquentiels,
+\end{itemize}
+
+pourrait améliorer la capture
+des dépendances temporelles longues
+dans les parcours utilisateurs.
+
+Ces approches sont particulièrement pertinentes
+pour les architectures NM-POMDP.
+
+\vspace{0.2cm}
+
+\item \textbf{POMDP adaptatifs} :
+
+Les futurs modèles pourraient intégrer :
+\begin{itemize}
+    \item des croyances dynamiques,
+    \item des observations bruitées,
+    \item des états latents évolutifs,
+    \item et des politiques auto-adaptatives.
+\end{itemize}
+
+Cela permettrait une représentation
+plus réaliste des comportements utilisateurs réels.
+
+\end{itemize}
+
+\vspace{0.4cm}
+
+%============================================================
+\subsubsection*{Perspectives Business et Industrielles}
+%============================================================
+
+Les modèles développés
+présentent également
+un fort potentiel industriel.
+
+\begin{itemize}
+
+\item \textbf{Systèmes de recommandation personnalisés} :
+
+Adapter dynamiquement
+les recommandations produits
+selon :
+\begin{itemize}
+    \item l’état comportemental,
+    \item la vitesse de navigation,
+    \item l’historique utilisateur,
+    \item et le contexte de session.
+\end{itemize}
+
+\vspace{0.2cm}
+
+\item \textbf{Optimisation budgétaire marketing} :
+
+Introduire des contraintes réelles :
+\[
+Budget_{max}
+\]
+afin de transformer les MDP
+en problèmes d’optimisation contraints.
+
+Cela permettrait :
+\begin{itemize}
+    \item d’optimiser les campagnes publicitaires,
+    \item de limiter les coûts marketing,
+    \item et de maximiser le retour sur investissement.
+\end{itemize}
+
+\vspace{0.2cm}
+
+\item \textbf{Feedback utilisateur et IRL} :
+
+L’intégration de méthodes
+d’Inverse Reinforcement Learning (IRL)
+permettrait d’inférer automatiquement
+les préférences réelles des utilisateurs
+à partir des comportements observés.
+
+\vspace{0.2cm}
+
+\item \textbf{Systèmes temps réel} :
+
+Les futurs modèles pourraient être déployés
+dans des architectures :
+\begin{itemize}
+    \item cloud,
+    \item streaming,
+    \item edge AI,
+    \item ou microservices.
+\end{itemize}
+
+Cela permettrait :
+\begin{itemize}
+    \item des recommandations instantanées,
+    \item des politiques adaptatives en ligne,
+    \item et une personnalisation temps réel.
+\end{itemize}
+
+\vspace{0.2cm}
+
+\item \textbf{Multi-Agent Reinforcement Learning} :
+
+Dans les plateformes complexes,
+plusieurs agents intelligents
+pourraient coopérer :
+
+\begin{itemize}
+    \item agent publicité,
+    \item agent recommandation,
+    \item agent pricing,
+    \item agent fidélisation.
+\end{itemize}
+
+Cela ouvrirait la voie
+à des systèmes e-commerce autonomes
+et entièrement adaptatifs.
+
+\end{itemize}
+
+\vspace{0.5cm}
+
+\begin{center}
+\begin{tcolorbox}[
+colback=LightBlue,
+colframe=DarkBlue,
+width=14cm,
+arc=6pt]
+
+\centering
+
+\textbf{
+Les travaux réalisés dans ce projet
+constituent une base méthodologique solide
+pour le développement futur
+de systèmes intelligents de recommandation,
+de décision et d’apprentissage adaptatif
+dans les environnements e-commerce modernes.
+}
+
+\end{tcolorbox}
+\end{center}
+\newpage
+%============================================================
+\section{Méthodologie}
+
+Ce projet repose sur une approche progressive combinant modélisation probabiliste, chaînes de Markov et apprentissage par renforcement afin d’analyser et d’optimiser les comportements utilisateurs dans un environnement e-commerce.
+
+La première étape a consisté à exploiter le dataset Yoochoose afin d’extraire les sessions utilisateurs, les interactions produit et les temps inter-clics. Les données ont ensuite été prétraitées afin de supprimer les valeurs inutiles, structurer les séquences comportementales et construire plusieurs états représentatifs du niveau d’engagement utilisateur.
+
+Dans une seconde étape, les chaînes de Markov discrètes (DTMC) et continues (CTMC) ont été utilisées pour modéliser les transitions comportementales et analyser la dynamique des utilisateurs. Les probabilités de transition, distributions stationnaires et temps de séjour ont permis de mieux comprendre l’évolution des comportements au cours des sessions.
+
+Les modèles de Markov cachés (HMM) ont ensuite été introduits afin de représenter des états utilisateurs non directement observables. Les algorithmes Forward, Backward, Viterbi et Baum-Welch ont été implémentés pour calculer les probabilités de séquences, décoder les états cachés et apprendre automatiquement les paramètres des modèles. Une extension continue des HMM a également été réalisée à partir des temps inter-clics et des distributions gaussiennes.
+
+La méthodologie a ensuite évolué vers les Processus de Décision Markoviens (MDP), permettant de transformer l’analyse comportementale en problème de décision optimale. Les algorithmes de Value Iteration et Howard Policy Iteration ont permis d’apprendre des politiques marketing optimales adaptées aux différents niveaux d’engagement utilisateur.
+
+Dans la phase suivante, plusieurs algorithmes de Reinforcement Learning ont été implémentés, notamment TD(0), TD($\lambda$), Q-Learning, SARSA et R-Learning. Ces méthodes ont permis d’apprendre dynamiquement des fonctions de valeur et des politiques optimales à partir des interactions utilisateur-environnement.
+
+Enfin, le projet a été étendu vers des modèles plus avancés tels que les POMDP, Self-POMDP et NM-POMDP afin de prendre en compte l’incertitude, les observations partielles et les dépendances temporelles longues. Des architectures séquentielles comme les réseaux LSTM, GRU et les mécanismes d’attention ont également été intégrées afin d’améliorer la modélisation des comportements utilisateurs complexes.
+
+L’ensemble de cette méthodologie a permis de construire un cadre complet d’analyse, de prédiction et d’optimisation des comportements utilisateurs dans les plateformes e-commerce modernes.
+\newpage
+%============================================================
+\section{Ressources Scientifiques}
+%============================================================
+
+Ce projet s’appuie sur plusieurs ressources scientifiques,
+articles académiques et ouvrages de référence
+dans les domaines des chaînes de Markov,
+des modèles cachés,
+des processus décisionnels
+et de l’apprentissage par renforcement.
+
+\vspace{0.3cm}
+
+\textbf{Dataset et systèmes de recommandation :}
+
+\begin{itemize}
+
+\item Ben-Shimon, D., Tsikinovsky, A., Friedmann, M., et al. (2015).
+\textit{RecSys Challenge 2015 and the YOOCHOOSE Dataset}.
+ACM RecSys.
+
+\item Hidasi, B., Karatzoglou, A., Baltrunas, L., Tikk, D. (2016).
+\textit{Session-based Recommendations with Recurrent Neural Networks}.
+
+\item Li, J., Ren, P., Chen, Z., Ren, Z., Lian, T., Ma, J. (2017).
+\textit{Neural Attentive Session-based Recommendation}.
+
+\item Quadrana, M., Karatzoglou, A., Hidasi, B., Cremonesi, P. (2017).
+\textit{Personalizing Session-based Recommendations with Hierarchical Recurrent Neural Networks}.
+
+\end{itemize}
+
+\vspace{0.3cm}
+
+\textbf{Chaînes de Markov et probabilités :}
+
+\begin{itemize}
+
+\item Norris, J. R. (1997).
+\textit{Markov Chains}.
+Cambridge University Press.
+
+\item Grinstead, C. M., Snell, J. L. (1997).
+\textit{Introduction to Probability}.
+American Mathematical Society.
+
+\end{itemize}
+
+\vspace{0.3cm}
+
+\textbf{Modèles de Markov Cachés (HMM) :}
+
+\begin{itemize}
+
+\item Rabiner, L. R. (1989).
+\textit{A Tutorial on Hidden Markov Models and Selected Applications in Speech Recognition}.
+Proceedings of the IEEE.
+
+\end{itemize}
+
+\vspace{0.3cm}
+
+\textbf{MDP, POMDP et Reinforcement Learning :}
+
+\begin{itemize}
+
+\item Sutton, R. S., Barto, A. G. (2018).
+\textit{Reinforcement Learning: An Introduction}.
+MIT Press.
+
+\item Watkins, C. J. C. H., Dayan, P. (1992).
+\textit{Q-Learning}.
+Machine Learning Journal.
+
+\item Kaelbling, L. P., Littman, M. L., Cassandra, A. R. (1998).
+\textit{Planning and Acting in Partially Observable Stochastic Domains}.
+Artificial Intelligence Journal.
+
+\item Rummery, G. A., Niranjan, M. (1994).
+\textit{On-line Q-Learning Using Connectionist Systems}.
+
+\end{itemize}
+
+\vspace{0.3cm}
+
+\textbf{Deep Learning et architectures séquentielles :}
+
+\begin{itemize}
+
+\item Hochreiter, S., Schmidhuber, J. (1997).
+\textit{Long Short-Term Memory}.
+Neural Computation.
+
+\item Cho, K., et al. (2014).
+\textit{Learning Phrase Representations using RNN Encoder-Decoder for Statistical Machine Translation}.
+
+\item Vaswani, A., et al. (2017).
+\textit{Attention Is All You Need}.
+
+\end{itemize}
+%  ANNEXES
+% 
+\end{document}

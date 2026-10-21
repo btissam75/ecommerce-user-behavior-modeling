@@ -1,0 +1,22 @@
+cff-version: 1.2.0
+message: "If you use this academic project, please cite it using the metadata below."
+title: "Probabilistic and Reinforcement Learning Models for E-Commerce User Behavior"
+type: software
+authors:
+  - family-names: "Arehal"
+    given-names: "Btissam"
+abstract: >-
+  An academic study of Yoochoose e-commerce sessions using discrete- and
+  continuous-time Markov chains, hidden Markov models, Markov decision
+  processes, reinforcement learning, and partially observable models.
+keywords:
+  - e-commerce
+  - Markov chains
+  - hidden Markov models
+  - reinforcement learning
+  - POMDP
+  - Yoochoose
+license: MIT
+version: 1.0.0
+date-released: 2026-05-09
+
